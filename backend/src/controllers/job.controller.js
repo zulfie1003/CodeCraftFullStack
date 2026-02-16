@@ -1,6 +1,6 @@
 // controllers/job.controller.js
-import Job from '../models/job.model.js';
-import User from '../models/user.model.js';
+import Job from '../models/Job.model.js';
+import User from '../models/User.model.js';
 import { sendSuccess, sendError } from '../utils/response.js';
 
 // Create job (Admin only)

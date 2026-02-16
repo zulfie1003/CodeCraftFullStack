@@ -1,5 +1,5 @@
 // controllers/project.controller.js
-import Project from '../models/project.model.js';
+import Project from '../models/Project.model.js';
 import { sendSuccess, sendError } from '../utils/response.js';
 
 // Create project

@@ -1,6 +1,6 @@
 // middleware/auth.middleware.js
 const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
+const User = require('../models/User.model');
 const { sendError } = require('../utils/response');
 
 exports.protect = async (req, res, next) => {
