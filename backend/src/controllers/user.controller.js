@@ -1,5 +1,5 @@
 // controllers/user.controller.js
-import User from '../models/user.model.js';
+import User from '../models/User.model.js';
 import { sendSuccess, sendError } from '../utils/response.js';
 
 // Get user profile

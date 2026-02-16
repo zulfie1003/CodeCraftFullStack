@@ -1,5 +1,5 @@
 // controllers/auth.controller.js
-import User from '../models/user.model.js';
+import User from '../models/User.model.js';
 import { signToken } from '../utils/jwt.js';
 import { sendSuccess, sendError } from '../utils/response.js';
 import { sendOTPEmail, sendPasswordResetSuccessEmail } from '../utils/email.js';
