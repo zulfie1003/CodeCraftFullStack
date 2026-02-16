@@ -1,17 +1,22 @@
 // middleware/auth.middleware.js
-const jwt = require('jsonwebtoken');
-const User = require('../models/User.model');
-const { sendError } = require('../utils/response');
+import jwt from 'jsonwebtoken';
+import User from '../models/User.model.js';
+import { sendError } from '../utils/response.js';
 
-exports.protect = async (req, res, next) => {
+// Protect routes middleware
+export const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Check for token in headers
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    // Check for token in Authorization header
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
       token = req.headers.authorization.split(' ')[1];
     }
 
+    // If no token found
     if (!token) {
       return sendError(res, 'Not authorized to access this route', 401);
     }
@@ -19,23 +24,26 @@ exports.protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Get user from token
+    // Find user by ID from token
     const user = await User.findById(decoded.id);
 
     if (!user) {
       return sendError(res, 'User not found', 404);
     }
 
+    // Attach user to request object
     req.user = user;
-    next();
 
+    next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
       return sendError(res, 'Invalid token', 401);
     }
+
     if (error.name === 'TokenExpiredError') {
       return sendError(res, 'Token expired', 401);
     }
+
     next(error);
   }
 };
