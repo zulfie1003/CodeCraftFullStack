@@ -56,7 +56,9 @@
   height: 70vh;
   display: flex;
   flex-direction: column;
-  backdropFilter: blur(10px);
+  /* backdropFilter: blur(10px); */
+  backdrop-filter: blur(10px);
+
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
