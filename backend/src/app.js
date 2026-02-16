@@ -13,26 +13,49 @@ import aiRoutes from './routes/ai.routes.js';
 
 const app = express();
 
-// Security Middleware
+// ========================
+// Middleware
+// ========================
+
+// Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS Middleware
+// CORS
 app.use(cors(corsConfig));
 
+// ========================
 // Routes
+// ========================
+
+// Root Route
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'CodeCraft Backend API is running 🚀'
+  });
+});
+
+// Health Check
+app.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'ok',
+    message: 'Server is running',
+    timestamp: new Date()
+  });
+});
+
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/project', projectRoutes);
 app.use('/api/job', jobRoutes);
 app.use('/api/ai', aiRoutes);
 
-// Health Check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running', timestamp: new Date() });
-});
-
-// 404 Handler
+// ========================
+// 404 Handler (Must be after routes)
+// ========================
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -40,7 +63,9 @@ app.use((req, res) => {
   });
 });
 
-// Error Handler (must be last)
+// ========================
+// Global Error Handler (Always Last)
+// ========================
 app.use(errorMiddleware);
 
 export default app;
