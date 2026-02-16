@@ -1,0 +1,784 @@
+/* ==================== DARK MODE (DEFAULT) ==================== */
+:root,
+[data-theme="dark"] {
+  /* Primary Colors */
+  --primary-color: #38bdf8;
+  --primary-dark: #06b6d4;
+  --primary-light: #0ea5e9;
+  --secondary-color: #6366f1;
+  --secondary-light: #818cf8;
+
+  /* Success Colors */
+  --success-color: #22c55e;
+  --success-dark: #16a34a;
+  --success-light: #4ade80;
+
+  /* Warning Colors */
+  --warning-color: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-light: #fbbf24;
+
+  /* Danger Colors */
+  --danger-color: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-light: #f87171;
+
+  /* Background Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-card: rgba(15, 23, 42, 0.8);
+  --bg-hover: rgba(30, 41, 59, 0.6);
+  --bg-input: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(30, 27, 60, 0.6));
+
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-tertiary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  /* Border Colors */
+  --border-primary: rgba(56, 189, 248, 0.3);
+  --border-secondary: rgba(255, 255, 255, 0.15);
+  --border-light: rgba(255, 255, 255, 0.08);
+
+  /* Shadow */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+  --shadow-primary: 0 4px 15px rgba(56, 189, 248, 0.2);
+}
+
+/* ==================== LIGHT MODE (WHITE + GREEN) ==================== */
+[data-theme="light"] {
+  /* Primary Colors - Rich Green for light mode */
+  --primary-color: #059669;
+  --primary-dark: #047857;
+  --primary-light: #10b981;
+  --secondary-color: #0891b2;
+  --secondary-light: #06b6d4;
+
+  /* Success Colors - Green shades */
+  --success-color: #16a34a;
+  --success-dark: #15803d;
+  --success-light: #22c55e;
+
+  /* Warning Colors */
+  --warning-color: #d97706;
+  --warning-dark: #b45309;
+  --warning-light: #f59e0b;
+
+  /* Danger Colors */
+  --danger-color: #dc2626;
+  --danger-dark: #b91c1c;
+  --danger-light: #ef4444;
+
+  /* Background Colors - Pure White & Very Light Gray */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-hover: #f9fafb;
+  --bg-input: linear-gradient(135deg, #ffffff, #f9fafb);
+
+  /* Text Colors - Dark Charcoal for light background */
+  --text-primary: #111827;
+  --text-secondary: #1f2937;
+  --text-tertiary: #374151;
+  --text-muted: #6b7280;
+
+  /* Border Colors - Green with opacity */
+  --border-primary: rgba(5, 150, 105, 0.25);
+  --border-secondary: rgba(5, 150, 105, 0.15);
+  --border-light: rgba(5, 150, 105, 0.08);
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.1);
+  --shadow-primary: 0 4px 12px rgba(5, 150, 105, 0.12);
+}
+
+/* ==================== GLOBAL THEME APPLICATION ==================== */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+button {
+  color: var(--text-primary);
+}
+
+/* ==================== NAVBAR THEME ==================== */
+.sd-navbar {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-secondary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sd-navbar button {
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.sd-navbar .theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-primary);
+}
+
+.sd-navbar .theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.3);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sd-navbar .logout {
+  background: transparent;
+  border: 1px solid var(--border-secondary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sd-navbar .logout:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--text-tertiary);
+}
+
+/* ==================== GENERAL ELEMENTS ==================== */
+
+.sd-container {
+  background-color: var(--bg-primary);
+}
+
+.sd-header h1 {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sd-header p {
+  color: var(--text-muted);
+}
+
+.sd-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-primary);
+  transition: all 0.3s ease;
+}
+
+.sd-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3);
+}
+
+.sd-btn.ghost {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.sd-btn.ghost:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--text-tertiary);
+}
+
+.sd-btn.primary {
+  background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+}
+
+/* ==================== PROFILE CARD ==================== */
+.profile-card {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.08));
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .profile-card {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.05), rgba(8, 145, 178, 0.05));
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.profile-left h2 {
+  color: var(--text-primary);
+}
+
+.profile-left .title {
+  color: var(--primary-color);
+}
+
+.profile-left .bio {
+  color: var(--text-muted);
+}
+
+.company-logo, .org-logo {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(56, 189, 248, 0.15));
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 8px 25px var(--shadow-primary);
+}
+
+[data-theme="light"] .company-logo,
+[data-theme="light"] .org-logo {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(8, 145, 178, 0.12));
+  border: 2px solid rgba(5, 150, 105, 0.3) !important;
+}
+
+/* ==================== PROFILE INPUTS ==================== */
+.profile-right input,
+.profile-left input,
+.profile-left textarea {
+  background: var(--bg-input);
+  border: 1.5px solid var(--border-secondary);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .profile-right input,
+[data-theme="light"] .profile-left input,
+[data-theme="light"] .profile-left textarea {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1.5px solid rgba(5, 150, 105, 0.25);
+  color: var(--text-primary);
+}
+
+.profile-right input::placeholder,
+.profile-left input::placeholder,
+.profile-left textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.profile-right input:focus,
+.profile-left input:focus,
+.profile-left textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+}
+
+/* ==================== STATS SECTION ==================== */
+.stat-box {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.12));
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .stat-box {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.08), rgba(8, 145, 178, 0.08));
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-number {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  color: var(--text-tertiary);
+}
+
+/* ==================== PROFILE BOX ==================== */
+.profile-box {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.08));
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .profile-box {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.05), rgba(8, 145, 178, 0.05));
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.profile-box h3 {
+  color: var(--text-primary);
+}
+
+.empty-state {
+  color: var(--text-muted);
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px dashed var(--border-secondary);
+}
+
+/* ==================== SKILL BARS ==================== */
+.skill {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .skill {
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.bar {
+  background: var(--bg-tertiary);
+}
+
+[data-theme="light"] .bar {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.bar div {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.skill .level {
+  color: var(--primary-color);
+}
+
+/* ==================== EDIT SECTIONS - Colors ==================== */
+
+/* Skills Edit */
+.skill-edit {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(56, 189, 248, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+[data-theme="light"] .skill-edit {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(14, 165, 233, 0.04));
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+.skill-edit input {
+  background: var(--bg-input);
+  border: 1.5px solid rgba(99, 102, 241, 0.2);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .skill-edit input {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1.5px solid rgba(5, 150, 105, 0.2);
+  color: var(--text-primary);
+}
+
+.skill-edit input:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Projects Edit */
+.project-edit {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(139, 92, 246, 0.05));
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+[data-theme="light"] .project-edit {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.04));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.project-edit input,
+.project-edit textarea {
+  background: var(--bg-input);
+  border: 1.5px solid rgba(168, 85, 247, 0.2);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .project-edit input,
+[data-theme="light"] .project-edit textarea {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1.5px solid rgba(5, 150, 105, 0.2);
+  color: var(--text-primary);
+}
+
+/* Events Edit */
+.event-edit {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(217, 119, 6, 0.05));
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="light"] .event-edit {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(217, 119, 6, 0.04));
+  border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.event-edit input {
+  background: var(--bg-input);
+  border: 1.5px solid rgba(245, 158, 11, 0.2);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .event-edit input {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1.5px solid rgba(5, 150, 105, 0.2);
+  color: var(--text-primary);
+}
+
+/* Team Edit */
+.team-edit {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(16, 185, 129, 0.05));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+[data-theme="light"] .team-edit {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(22, 163, 74, 0.04));
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.team-edit input {
+  background: var(--bg-input);
+  border: 1.5px solid rgba(34, 197, 94, 0.2);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .team-edit input {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1.5px solid rgba(5, 150, 105, 0.2);
+  color: var(--text-primary);
+}
+
+/* Jobs Edit */
+.job-edit {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(139, 92, 246, 0.05));
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+[data-theme="light"] .job-edit {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.04));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.job-edit input {
+  background: var(--bg-input);
+  border: 1.5px solid rgba(168, 85, 247, 0.2);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .job-edit input {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1.5px solid rgba(5, 150, 105, 0.2);
+  color: var(--text-primary);
+}
+
+/* ==================== STATS EDIT SECTION ==================== */
+.stats-edit-section {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+[data-theme="light"] .stats-edit-section {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(5, 150, 105, 0.08));
+  border: 1px solid rgba(22, 163, 74, 0.25);
+}
+
+.stats-edit-section h3 {
+  color: var(--success-color);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+[data-theme="light"] .stats-edit-section h3 {
+  color: var(--success-dark);
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.stats-edit-grid input {
+  background: var(--bg-input);
+  border: 1.5px solid rgba(34, 197, 94, 0.2);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .stats-edit-grid input {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border: 1.5px solid rgba(5, 150, 105, 0.25);
+  color: var(--text-primary);
+}
+
+.stats-edit-grid input:focus {
+  border-color: var(--success-color);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.stats-edit-grid label {
+  color: var(--text-tertiary);
+}
+
+/* ==================== CARDS ==================== */
+.project {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(56, 189, 248, 0.05));
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-left: 4px solid var(--primary-color);
+}
+
+[data-theme="light"] .project {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.08), rgba(8, 145, 178, 0.04));
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.project h4 {
+  color: var(--text-primary);
+}
+
+.project p {
+  color: var(--text-tertiary);
+}
+
+.tags span {
+  background: rgba(56, 189, 248, 0.2);
+  color: var(--primary-color);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+[data-theme="light"] .tags span {
+  background: rgba(5, 150, 105, 0.12);
+  color: var(--primary-dark);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.event-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(217, 119, 6, 0.08));
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-left: 4px solid var(--warning-color);
+}
+
+[data-theme="light"] .event-card {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(217, 119, 6, 0.04));
+  border: 2px solid rgba(5, 150, 105, 0.25);
+  border-left: 4px solid rgba(5, 150, 105, 0.6);
+}
+
+.team-card {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(16, 185, 129, 0.08));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-left: 4px solid var(--success-color);
+}
+
+[data-theme="light"] .team-card {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(5, 150, 105, 0.08));
+  border: 2px solid rgba(5, 150, 105, 0.25);
+  border-left: 4px solid rgba(5, 150, 105, 0.6);
+}
+
+.team-card h4 {
+  color: var(--text-primary);
+}
+
+.role {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+[data-theme="light"] .role {
+  color: var(--primary-dark);
+}
+
+.job-card {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(139, 92, 246, 0.08));
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-left: 4px solid #a855f7;
+}
+
+[data-theme="light"] .job-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.04));
+  border: 2px solid rgba(5, 150, 105, 0.25);
+  border-left: 4px solid rgba(5, 150, 105, 0.6);
+}
+
+.salary {
+  color: var(--success-color);
+}
+
+[data-theme="light"] .salary {
+  color: var(--success-dark);
+}
+
+/* ==================== BUTTONS ==================== */
+.delete-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: var(--danger-color);
+  transition: all 0.3s ease;
+}
+
+[data-theme="light"] .delete-btn {
+  background: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: var(--danger-color);
+}
+
+.add-btn {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2));
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: var(--success-color);
+  transition: all 0.3s ease;
+}
+
+[data-theme="light"] .add-btn {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(5, 150, 105, 0.2));
+  border: 1px solid rgba(22, 163, 74, 0.4);
+  color: var(--success-dark);
+}
+
+.add-btn:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(16, 185, 129, 0.3));
+  border-color: var(--success-color);
+}
+
+/* ==================== IMAGE UPLOAD MODAL ==================== */
+.image-modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] .image-modal-overlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.image-modal {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+[data-theme="light"] .image-modal {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.image-modal h3 {
+  color: var(--text-primary);
+}
+
+.file-input-label {
+  border: 2px dashed rgba(56, 189, 248, 0.4);
+  color: var(--text-tertiary);
+}
+
+[data-theme="light"] .file-input-label {
+  border: 2px dashed rgba(5, 150, 105, 0.4);
+}
+
+.file-input-label:hover {
+  border-color: var(--primary-color);
+  background: rgba(5, 150, 105, 0.05);
+  color: var(--primary-color);
+}
+
+[data-theme="light"] .file-input-label:hover {
+  background: rgba(5, 150, 105, 0.05);
+}
+
+.cropper-container {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .cropper-container {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.canvas-cropper {
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+[data-theme="light"] .canvas-cropper {
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.zoom-controls {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-tertiary);
+}
+
+[data-theme="light"] .zoom-controls {
+  background: rgba(241, 245, 249, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--text-tertiary);
+}
+
+.control-btn {
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+[data-theme="light"] .control-btn {
+  background: rgba(5, 150, 105, 0.15);
+  border: 1px solid rgba(5, 150, 105, 0.5);
+  color: var(--primary-dark);
+}
+
+/* ==================== ADD/EDIT FORMS - Color Variants ==================== */
+.add-skill {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(56, 189, 248, 0.03));
+  border: 1.5px dashed rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="light"] .add-skill {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.06), rgba(8, 145, 178, 0.03));
+  border: 1.5px dashed rgba(5, 150, 105, 0.3);
+}
+
+.add-project {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.06), rgba(139, 92, 246, 0.03));
+  border: 1.5px dashed rgba(168, 85, 247, 0.3);
+}
+
+[data-theme="light"] .add-project {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.06), rgba(8, 145, 178, 0.03));
+  border: 1.5px dashed rgba(5, 150, 105, 0.3);
+}
+
+.add-event {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(217, 119, 6, 0.03));
+  border: 1.5px dashed rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="light"] .add-event {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.06), rgba(217, 119, 6, 0.03));
+  border: 1.5px dashed rgba(5, 150, 105, 0.3);
+}
+
+.add-member {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.06), rgba(16, 185, 129, 0.03));
+  border: 1.5px dashed rgba(34, 197, 94, 0.3);
+}
+
+[data-theme="light"] .add-member {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.06), rgba(5, 150, 105, 0.03));
+  border: 1.5px dashed rgba(5, 150, 105, 0.3);
+}
+
+.add-job {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.06), rgba(139, 92, 246, 0.03));
+  border: 1.5px dashed rgba(168, 85, 247, 0.3);
+}
+
+[data-theme="light"] .add-job {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(99, 102, 241, 0.03));
+  border: 1.5px dashed rgba(99, 102, 241, 0.3);
+}
