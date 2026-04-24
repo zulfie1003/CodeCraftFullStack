@@ -1,8 +1,10 @@
 import StudentProfile from "../models/StudentProfile.model.js";
 import User from "../models/User.model.js";
+import { parseResumeForStudentProfile } from "../services/resumeAutofill.service.js";
 import { sendError, sendSuccess } from "../utils/response.js";
 import {
   ensureStudentProfile,
+  normalizeExperiences,
   normalizeProjects,
   normalizeStringArray,
 } from "../utils/studentProfile.js";
@@ -21,6 +23,7 @@ const buildStudentProfilePayload = (payload = {}) => {
   }
   if ("skills" in payload) nextPayload.skills = normalizeStringArray(payload.skills);
   if ("projects" in payload) nextPayload.projects = normalizeProjects(payload.projects);
+  if ("experiences" in payload) nextPayload.experiences = normalizeExperiences(payload.experiences);
   if ("githubUrl" in payload) nextPayload.githubUrl = String(payload.githubUrl || "").trim();
   if ("leetcodeUrl" in payload) nextPayload.leetcodeUrl = String(payload.leetcodeUrl || "").trim();
   if ("gfgUrl" in payload) nextPayload.gfgUrl = String(payload.gfgUrl || "").trim();
@@ -31,7 +34,8 @@ const buildStudentProfilePayload = (payload = {}) => {
     nextPayload.resume = {
       fileName: String(payload.resume.fileName || "").trim(),
       dataUrl: String(payload.resume.dataUrl || "").trim(),
-      uploadedAt: payload.resume.dataUrl ? new Date() : undefined,
+      text: String(payload.resume.text || "").trim(),
+      uploadedAt: payload.resume.dataUrl || payload.resume.text ? new Date() : undefined,
     };
   }
 
@@ -45,11 +49,18 @@ const syncUserFromStudentProfile = async (userId, studentProfile) => {
       name: studentProfile.name,
       email: studentProfile.email,
       skills: studentProfile.skills,
+      phone: studentProfile.phone,
       github: studentProfile.githubUrl,
       leetcode: studentProfile.leetcodeUrl,
       gfg: studentProfile.gfgUrl,
       linkedin: studentProfile.linkedinUrl,
       portfolio: studentProfile.portfolioUrl,
+      resume: {
+        fileName: studentProfile.resume?.fileName || "",
+        dataUrl: studentProfile.resume?.dataUrl || "",
+        text: studentProfile.resume?.text || "",
+        uploadedAt: studentProfile.resume?.uploadedAt,
+      },
     },
     { new: true, runValidators: true }
   );
@@ -108,6 +119,62 @@ export const upsertMyStudentProfile = async (req, res, next) => {
 
     sendSuccess(res, { studentProfile }, "Student profile updated successfully");
   } catch (error) {
+    next(error);
+  }
+};
+
+export const autofillMyStudentProfileFromResume = async (req, res, next) => {
+  try {
+    if (req.user.role !== "student") {
+      return sendError(res, "Only students can update a student profile", 403);
+    }
+
+    const currentProfile = await ensureStudentProfile(req.user.id);
+
+    if (!currentProfile) {
+      return sendError(res, "Student profile not found", 404);
+    }
+
+    const resume = req.body?.resume;
+
+    if (!resume || typeof resume !== "object" || !String(resume.dataUrl || "").trim()) {
+      return sendError(res, "Resume file is required for autofill", 400);
+    }
+
+    const { mergedProfile, usedAI, resumeText, extractedProfile } = await parseResumeForStudentProfile({
+      resume,
+      currentProfile,
+    });
+
+    mergedProfile.email = currentProfile.email || req.user.email;
+
+    const studentProfile = await StudentProfile.findOneAndUpdate(
+      { user: req.user.id },
+      buildStudentProfilePayload(mergedProfile),
+      { new: true, runValidators: true }
+    );
+
+    await syncUserFromStudentProfile(req.user.id, studentProfile);
+
+    sendSuccess(
+      res,
+      {
+        studentProfile,
+        autofill: {
+          usedAI,
+          extractedSkills: extractedProfile.skills.length,
+          extractedProjects: extractedProfile.projects.length,
+          extractedExperiences: extractedProfile.experiences.length,
+          resumeTextLength: resumeText.length,
+        },
+      },
+      "Student profile autofilled from resume successfully"
+    );
+  } catch (error) {
+    if (error.status) {
+      return sendError(res, error.message, error.status);
+    }
+
     next(error);
   }
 };

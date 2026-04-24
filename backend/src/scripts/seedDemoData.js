@@ -29,7 +29,9 @@ const buildDemoJobs = () => [
   {
     title: "Frontend Developer Intern",
     company: "CodeCraft Labs",
+    source: "company",
     type: "internship",
+    experience: "0-1 years",
     experienceLevel: "fresher",
     location: "Bengaluru, India",
     remote: true,
@@ -53,7 +55,9 @@ const buildDemoJobs = () => [
   {
     title: "MERN Stack Developer",
     company: "CodeCraft Labs",
+    source: "company",
     type: "fulltime",
+    experience: "1-3 years",
     experienceLevel: "junior",
     location: "Pune, India",
     remote: false,
@@ -77,7 +81,9 @@ const buildDemoJobs = () => [
   {
     title: "AI Product Engineering Intern",
     company: "CodeCraft Labs",
+    source: "company",
     type: "internship",
+    experience: "0-1 years",
     experienceLevel: "fresher",
     location: "Hyderabad, India",
     remote: true,

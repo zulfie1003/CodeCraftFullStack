@@ -2,6 +2,25 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+const resumeSchema = new mongoose.Schema(
+  {
+    fileName: {
+      type: String,
+      trim: true
+    },
+    dataUrl: {
+      type: String
+    },
+    text: {
+      type: String
+    },
+    uploadedAt: {
+      type: Date
+    }
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -35,7 +54,18 @@ const userSchema = new mongoose.Schema({
     },
     default: 'student'
   },
-  skills: [String],
+  skills: {
+    type: [String],
+    default: []
+  },
+  resume: {
+    type: resumeSchema,
+    default: () => ({})
+  },
+  bookmarkedJobs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Job'
+  }],
   bio: String,
   avatar: String,
   github: String,
@@ -88,6 +118,8 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+userSchema.index({ bookmarkedJobs: 1 });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {

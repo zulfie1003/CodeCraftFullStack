@@ -20,6 +20,47 @@ const projectSchema = new mongoose.Schema(
   { _id: true }
 );
 
+const experienceSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    company: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    type: {
+      type: String,
+      enum: ["internship", "fulltime", "parttime", "contract", "freelance", "leadership", "other"],
+      default: "other",
+    },
+    duration: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    location: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    link: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+  },
+  { _id: true }
+);
+
 const resumeSchema = new mongoose.Schema(
   {
     fileName: {
@@ -27,6 +68,9 @@ const resumeSchema = new mongoose.Schema(
       trim: true,
     },
     dataUrl: {
+      type: String,
+    },
+    text: {
       type: String,
     },
     uploadedAt: {
@@ -86,6 +130,10 @@ const studentProfileSchema = new mongoose.Schema(
     },
     projects: {
       type: [projectSchema],
+      default: [],
+    },
+    experiences: {
+      type: [experienceSchema],
       default: [],
     },
     resume: {

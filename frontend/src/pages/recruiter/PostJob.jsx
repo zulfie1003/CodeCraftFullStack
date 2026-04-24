@@ -6,8 +6,10 @@ import "../../styles/recruiter.css";
 const INITIAL_FORM = {
   title: "",
   company: "",
+  source: "manual",
   location: "",
   type: "fulltime",
+  experience: "",
   experienceLevel: "fresher",
   remote: false,
   salaryMin: "",
@@ -19,6 +21,14 @@ const INITIAL_FORM = {
   applyUrl: "",
   expiresAt: "",
 };
+
+const SOURCE_OPTIONS = [
+  { label: "Manual Entry", value: "manual" },
+  { label: "Company Careers", value: "company" },
+  { label: "Naukri Redirect", value: "naukri" },
+  { label: "Adzuna", value: "adzuna" },
+  { label: "Other", value: "other" },
+];
 
 const splitMultivalueField = (value) =>
   value
@@ -38,14 +48,12 @@ const PostJob = () => {
     if (!form.title.trim()) nextErrors.title = "Job title required";
     if (!form.company.trim()) nextErrors.company = "Company required";
     if (!form.location.trim()) nextErrors.location = "Location required";
+    if (!form.source) nextErrors.source = "Source required";
     if (!form.type) nextErrors.type = "Job type required";
     if (!form.experienceLevel) nextErrors.experienceLevel = "Experience level required";
     if (!form.description.trim()) nextErrors.description = "Description required";
     if (!form.applyUrl.trim()) nextErrors.applyUrl = "Apply URL required";
     if (splitMultivalueField(form.skills).length === 0) nextErrors.skills = "Add at least one skill";
-    if (splitMultivalueField(form.requirements).length === 0) {
-      nextErrors.requirements = "Add at least one requirement";
-    }
 
     if (form.salaryMin && Number.isNaN(Number(form.salaryMin))) {
       nextErrors.salaryMin = "Min salary must be a number";
@@ -92,8 +100,10 @@ const PostJob = () => {
       await api.post("/jobs", {
         title: form.title.trim(),
         company: form.company.trim(),
-        location: form.remote ? `Remote (${form.location.trim()})` : form.location.trim(),
+        source: form.source,
+        location: form.location.trim(),
         type: form.type,
+        experience: form.experience.trim(),
         experienceLevel: form.experienceLevel,
         remote: form.remote,
         description: form.description.trim(),
@@ -108,7 +118,7 @@ const PostJob = () => {
         },
       });
 
-      setSuccessMessage("Job posted successfully. It will now appear in the student jobs section with structured skill matching.");
+      setSuccessMessage("Job saved successfully. It will appear in CodeCraft Jobs with external apply redirect and skill-based matching.");
       setForm(INITIAL_FORM);
     } catch (error) {
       setErrors({
@@ -122,9 +132,9 @@ const PostJob = () => {
   return (
     <RecruiterLayout>
       <div className="page-intro">
-        <h1>Post New Job</h1>
+        <h1>Manual Job Entry</h1>
         <p>
-          Add structured skills and requirements so student job matching can calculate portfolio-fit percentages correctly.
+          Add structured job metadata, required skills, and an external apply link. CodeCraft will recommend the role but will not host the application itself.
         </p>
       </div>
 
@@ -151,6 +161,18 @@ const PostJob = () => {
           </div>
 
           <div className="form-field">
+            <label>Job Source</label>
+            <select value={form.source} onChange={(event) => handleChange("source", event.target.value)}>
+              {SOURCE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {errors.source && <p className="error">{errors.source}</p>}
+          </div>
+
+          <div className="form-field">
             <label>Location</label>
             <input
               placeholder="Bangalore"
@@ -169,6 +191,15 @@ const PostJob = () => {
               <option value="contract">Contract</option>
             </select>
             {errors.type && <p className="error">{errors.type}</p>}
+          </div>
+
+          <div className="form-field">
+            <label>Experience</label>
+            <input
+              placeholder="0-2 years"
+              value={form.experience}
+              onChange={(event) => handleChange("experience", event.target.value)}
+            />
           </div>
 
           <div className="form-field">
@@ -245,10 +276,10 @@ const PostJob = () => {
           </div>
         </div>
 
-        <div className="form-field">
-          <label>Job Description</label>
+          <div className="form-field">
+            <label>Short Summary</label>
           <textarea
-            placeholder="Describe the role, ownership, responsibilities, and expected outcomes."
+            placeholder="Add a concise summary of the role, ownership, and expected outcomes."
             value={form.description}
             onChange={(event) => handleChange("description", event.target.value)}
           />
@@ -272,12 +303,11 @@ const PostJob = () => {
             <label>Job Requirements</label>
             <textarea
               className="compact-textarea"
-              placeholder={"2+ years experience\nStrong debugging\nAPI integration experience"}
+              placeholder={"Strong debugging\nAPI integration experience\nPortfolio-ready frontend work"}
               value={form.requirements}
               onChange={(event) => handleChange("requirements", event.target.value)}
             />
-            <p className="field-help">Use one requirement per line or separate with commas.</p>
-            {errors.requirements && <p className="error">{errors.requirements}</p>}
+            <p className="field-help">Optional. Use one requirement per line or separate with commas.</p>
           </div>
         </div>
 

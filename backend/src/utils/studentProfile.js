@@ -29,6 +29,23 @@ export const normalizeProjects = (projects = []) =>
         .filter((project) => project.title && project.description)
     : [];
 
+export const normalizeExperiences = (experiences = []) =>
+  Array.isArray(experiences)
+    ? experiences
+        .map((experience) => ({
+          title: String(experience?.title || experience?.role || "").trim(),
+          company: String(experience?.company || experience?.organization || "").trim(),
+          type: String(experience?.type || "other")
+            .trim()
+            .toLowerCase(),
+          duration: String(experience?.duration || "").trim(),
+          location: String(experience?.location || "").trim(),
+          description: String(experience?.description || experience?.summary || "").trim(),
+          link: String(experience?.link || "").trim(),
+        }))
+        .filter((experience) => experience.title)
+    : [];
+
 export const ensureStudentProfile = async (userId) => {
   const user = await User.findById(userId);
 

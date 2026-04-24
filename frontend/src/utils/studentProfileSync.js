@@ -96,6 +96,18 @@ export const syncStudentProfileCache = (studentProfile) => {
           tags: [],
         }))
       : [],
+    experiences: Array.isArray(studentProfile.experiences)
+      ? studentProfile.experiences.map((experience, index) => ({
+          id: experience._id || `${experience.title}-${index}`,
+          title: experience.title,
+          company: experience.company,
+          type: experience.type,
+          duration: experience.duration,
+          location: experience.location,
+          description: experience.description,
+          link: experience.link,
+        }))
+      : [],
   };
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(nextProfile));

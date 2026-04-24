@@ -20,8 +20,10 @@ import studentProfileRoutes from "./routes/studentProfile.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import registrationRoutes from "./routes/registration.routes.js";
+import resumeRoutes from "./routes/resume.routes.js";
 
 const app = express();
+const requestBodyLimit = process.env.REQUEST_BODY_LIMIT || "12mb";
 
 // ========================
 // Global Middlewares
@@ -38,8 +40,8 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 // Body Parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: requestBodyLimit }));
+app.use(express.urlencoded({ extended: true, limit: requestBodyLimit }));
 
 // ========================
 // Health & Root Routes
@@ -86,6 +88,7 @@ app.use("/api/registrations", registrationRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/mentor-bookings", mentorBookingRoutes);
 app.use("/api/practice", practiceRoutes);
+app.use("/api/resume", resumeRoutes);
 
 // ========================
 // 404 Route Handler

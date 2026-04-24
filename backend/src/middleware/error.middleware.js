@@ -26,6 +26,14 @@ const errorMiddleware = (err, req, res, next) => {
     });
   }
 
+  if (err.type === 'entity.too.large' || err.status === 413) {
+    return res.status(413).json({
+      success: false,
+      status: 413,
+      message: 'Uploaded file is too large. Please use a smaller resume PDF/DOCX/TXT file.'
+    });
+  }
+
   console.error(`[${new Date().toISOString()}] ❌ Error:`, err);
 
   res.status(status).json({

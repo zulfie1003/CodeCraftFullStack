@@ -18,6 +18,7 @@ import {
 import api from "../../api/axios";
 import StudentLayout from "../../layouts/StudentLayout";
 import { STUDENT_PROFILE_UPDATED_EVENT } from "../../utils/studentProfileSync";
+import { fetchGitHubPublicFallback } from "../../utils/githubFallback";
 import {
   formatCompactNumber,
   formatSyncLabel,
@@ -50,9 +51,31 @@ const normalizePlatformState = (payload = {}) => ({
   syncedAt: payload.syncedAt || null,
 });
 
+const shouldRetryGitHubInBrowser = (githubResult, handles) =>
+  Boolean(handles.githubUsername) &&
+  !githubResult?.data &&
+  /status 403|rate limit/i.test(githubResult?.error || "");
+
 const fetchPlatformState = async (handles) => {
   const response = await api.post("/users/platform-stats", handles);
-  return normalizePlatformState(response.data?.data);
+  const nextState = normalizePlatformState(response.data?.data);
+
+  if (shouldRetryGitHubInBrowser(nextState.github, handles)) {
+    try {
+      const githubData = await fetchGitHubPublicFallback(handles.githubUsername);
+
+      if (githubData) {
+        nextState.github = {
+          data: githubData,
+          error: null,
+        };
+      }
+    } catch (error) {
+      console.error("GitHub browser fallback failed:", error);
+    }
+  }
+
+  return nextState;
 };
 
 const readDashboardSources = () => {

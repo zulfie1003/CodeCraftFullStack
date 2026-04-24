@@ -55,7 +55,7 @@ const MyJobs = () => {
     <RecruiterLayout>
       <div className="page-intro">
         <h1>My Jobs</h1>
-        <p>Review the live jobs you have posted for students.</p>
+        <p>Review the external jobs you have published into CodeCraft Jobs.</p>
       </div>
 
       {error && <p className="error">{error}</p>}
@@ -63,9 +63,10 @@ const MyJobs = () => {
       <div className="table jobs-table-wide">
         <div className="table-head">
           <span>Job Title</span>
+          <span>Source</span>
           <span>Type</span>
           <span>Experience</span>
-          <span>Skills</span>
+          <span>Apply Link</span>
           <span>Status</span>
           <span>Posted</span>
         </div>
@@ -81,9 +82,18 @@ const MyJobs = () => {
                 <strong>{job.title}</strong>
                 <small>{job.company}</small>
               </span>
+              <span>{job.source || "manual"}</span>
               <span>{formatJobType(job.type)}</span>
-              <span>{job.experienceLevel || "fresher"}</span>
-              <span>{Array.isArray(job.skills) && job.skills.length ? `${job.skills.length} skills` : "No skills"}</span>
+              <span>{job.experience || job.experienceLevel || "fresher"}</span>
+              <span>
+                {job.applyUrl ? (
+                  <a href={job.applyUrl} target="_blank" rel="noreferrer">
+                    External link
+                  </a>
+                ) : (
+                  "Missing"
+                )}
+              </span>
               <span className={job.status === "active" ? "open" : "closed"}>{job.status}</span>
               <span>{new Date(job.createdAt).toLocaleDateString()}</span>
             </div>

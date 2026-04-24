@@ -901,6 +901,7 @@
 .profile-secondary-btn:disabled,
 .inline-form-row button:disabled,
 .project-form-grid button:disabled,
+.experience-form-grid button:disabled,
 .project-card-v2 button:disabled,
 .skill-chip:disabled {
   cursor: not-allowed;
@@ -971,6 +972,9 @@
 .profile-fields-grid label,
 .project-form-grid textarea,
 .project-form-grid input,
+.experience-form-grid textarea,
+.experience-form-grid input,
+.experience-form-grid select,
 .inline-form-row input {
   display: flex;
   flex-direction: column;
@@ -1020,6 +1024,12 @@
   color: #38bdf8;
 }
 
+.resume-box-copy {
+  margin: 6px 0 0;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
 .inline-form-row {
   display: flex;
   gap: 12px;
@@ -1031,6 +1041,7 @@
 
 .inline-form-row button,
 .project-form-grid button,
+.experience-form-grid button,
 .project-card-v2 button,
 .skill-chip {
   background: rgba(56, 189, 248, 0.16);
@@ -1056,7 +1067,14 @@
   gap: 12px;
 }
 
-.project-list {
+.experience-form-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.project-list,
+.experience-list {
   display: grid;
   gap: 14px;
   margin-top: 16px;
@@ -1072,6 +1090,23 @@
   background: rgba(15, 23, 42, 0.72);
 }
 
+.project-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-card-editor,
+.experience-card-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.experience-card-editor-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .project-card-v2 p {
   margin: 8px 0;
   color: #cbd5e1;
@@ -1080,6 +1115,14 @@
 .project-card-v2 a {
   color: #38bdf8;
   word-break: break-word;
+}
+
+.experience-card {
+  border: 1px solid rgba(56, 189, 248, 0.12);
+}
+
+.experience-meta {
+  color: #7dd3fc;
 }
 
 .profile-message {
@@ -1112,6 +1155,10 @@
 @media (max-width: 640px) {
   .profile-shell-v2 {
     padding: 16px;
+  }
+
+  .experience-card-editor-grid {
+    grid-template-columns: 1fr;
   }
 
   .profile-page-header,

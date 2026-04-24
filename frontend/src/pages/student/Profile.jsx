@@ -8,10 +8,21 @@ import { syncStudentProfileCache } from "../../utils/studentProfileSync";
 const EMPTY_RESUME = {
   fileName: "",
   dataUrl: "",
+  text: "",
 };
 
 const EMPTY_PROJECT = {
   title: "",
+  description: "",
+  link: "",
+};
+
+const EMPTY_EXPERIENCE = {
+  title: "",
+  company: "",
+  type: "internship",
+  duration: "",
+  location: "",
   description: "",
   link: "",
 };
@@ -26,6 +37,7 @@ const EMPTY_PROFILE = {
   experienceLevel: "fresher",
   skills: [],
   projects: [],
+  experiences: [],
   resume: EMPTY_RESUME,
   githubUrl: "",
   leetcodeUrl: "",
@@ -37,6 +49,7 @@ const EMPTY_PROFILE = {
 const cloneResume = (resume = {}) => ({
   fileName: resume.fileName || "",
   dataUrl: resume.dataUrl || "",
+  text: resume.text || "",
 });
 
 const normalizeProfile = (studentProfile = {}, fallbackUser) => ({
@@ -46,8 +59,40 @@ const normalizeProfile = (studentProfile = {}, fallbackUser) => ({
   email: studentProfile.email || fallbackUser?.email || "",
   skills: Array.isArray(studentProfile.skills) ? studentProfile.skills : [],
   projects: Array.isArray(studentProfile.projects) ? studentProfile.projects : [],
+  experiences: Array.isArray(studentProfile.experiences) ? studentProfile.experiences : [],
   resume: cloneResume(studentProfile.resume),
 });
+
+const syncStoredUserFromProfile = (studentProfile) => {
+  const existingUser = getStoredUser();
+
+  if (!existingUser) {
+    return;
+  }
+
+  localStorage.setItem(
+    "user",
+    JSON.stringify({
+      ...existingUser,
+      name: studentProfile.name,
+      email: studentProfile.email,
+      phone: studentProfile.phone,
+      github: studentProfile.githubUrl,
+      leetcode: studentProfile.leetcodeUrl,
+      gfg: studentProfile.gfgUrl,
+      linkedin: studentProfile.linkedinUrl,
+      portfolio: studentProfile.portfolioUrl,
+    })
+  );
+};
+
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (loadEvent) => resolve(String(loadEvent.target?.result || ""));
+    reader.onerror = () => reject(new Error("Unable to read the selected file."));
+    reader.readAsDataURL(file);
+  });
 
 const getConnectedProfileCount = (profile) =>
   [
@@ -58,17 +103,37 @@ const getConnectedProfileCount = (profile) =>
     profile.portfolioUrl,
   ].filter(Boolean).length;
 
+const buildCourseDurationOptions = (selectedValue = "") => {
+  const currentYear = new Date().getFullYear();
+  const options = [];
+  const preferredDurations = [4, 3, 2, 5, 6];
+
+  for (let startYear = currentYear + 2; startYear >= currentYear - 8; startYear -= 1) {
+    preferredDurations.forEach((duration) => {
+      options.push(`${startYear} - ${startYear + duration}`);
+    });
+  }
+
+  if (selectedValue && !options.includes(selectedValue)) {
+    options.unshift(selectedValue);
+  }
+
+  return [...new Set(options)];
+};
+
 function Profile() {
   const [fallbackUser] = useState(() => getStoredUser());
   const [savedProfile, setSavedProfile] = useState(() => normalizeProfile({}, fallbackUser));
   const [form, setForm] = useState(() => normalizeProfile({}, fallbackUser));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [parsingResume, setParsingResume] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [newSkill, setNewSkill] = useState("");
   const [newProject, setNewProject] = useState(EMPTY_PROJECT);
+  const [newExperience, setNewExperience] = useState(EMPTY_EXPERIENCE);
 
   useEffect(() => {
     let isMounted = true;
@@ -103,6 +168,7 @@ function Profile() {
 
   const isReadOnly = !isEditing || loading || saving;
   const connectedProfilesCount = getConnectedProfileCount(form);
+  const courseDurationOptions = buildCourseDurationOptions(form.year);
 
   const updateField = (field, value) => {
     setForm((current) => ({
@@ -116,6 +182,7 @@ function Profile() {
     setSuccess("");
     setNewSkill("");
     setNewProject(EMPTY_PROJECT);
+    setNewExperience(EMPTY_EXPERIENCE);
     setForm(normalizeProfile(savedProfile, fallbackUser));
     setIsEditing(true);
   };
@@ -125,6 +192,7 @@ function Profile() {
     setSuccess("");
     setNewSkill("");
     setNewProject(EMPTY_PROJECT);
+    setNewExperience(EMPTY_EXPERIENCE);
     setForm(normalizeProfile(savedProfile, fallbackUser));
     setIsEditing(false);
   };
@@ -185,6 +253,35 @@ function Profile() {
     setNewProject(EMPTY_PROJECT);
   };
 
+  const addExperience = () => {
+    if (!isEditing) {
+      return;
+    }
+
+    if (!newExperience.title.trim()) {
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      experiences: [
+        ...current.experiences,
+        {
+          _id: String(Date.now()),
+          title: newExperience.title.trim(),
+          company: newExperience.company.trim(),
+          type: newExperience.type,
+          duration: newExperience.duration.trim(),
+          location: newExperience.location.trim(),
+          description: newExperience.description.trim(),
+          link: newExperience.link.trim(),
+        },
+      ],
+    }));
+
+    setNewExperience(EMPTY_EXPERIENCE);
+  };
+
   const removeProject = (projectId) => {
     if (!isEditing) {
       return;
@@ -196,28 +293,96 @@ function Profile() {
     }));
   };
 
-  const handleResumeUpload = (event) => {
+  const updateProject = (projectId, field, value) => {
     if (!isEditing) {
       return;
     }
 
+    setForm((current) => ({
+      ...current,
+      projects: current.projects.map((project) =>
+        (project._id || project.id) === projectId
+          ? { ...project, [field]: value }
+          : project
+      ),
+    }));
+  };
+
+  const removeExperience = (experienceId) => {
+    if (!isEditing) {
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      experiences: current.experiences.filter(
+        (experience) => (experience._id || experience.id) !== experienceId
+      ),
+    }));
+  };
+
+  const updateExperience = (experienceId, field, value) => {
+    if (!isEditing) {
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      experiences: current.experiences.map((experience) =>
+        (experience._id || experience.id) === experienceId
+          ? { ...experience, [field]: value }
+          : experience
+      ),
+    }));
+  };
+
+  const handleResumeUpload = async (event) => {
     const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (loadEvent) => {
-      setForm((current) => ({
-        ...current,
+    setParsingResume(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      const response = await api.post("/student-profiles/me/autofill-resume", {
         resume: {
           fileName: file.name,
-          dataUrl: String(loadEvent.target?.result || ""),
+          dataUrl,
         },
-      }));
-    };
-    reader.readAsDataURL(file);
+      });
+
+      const nextProfile = normalizeProfile(response.data?.data?.studentProfile, fallbackUser);
+      const autofill = response.data?.data?.autofill || {};
+
+      setSavedProfile(nextProfile);
+      setForm(nextProfile);
+      syncStudentProfileCache(nextProfile);
+      syncStoredUserFromProfile(nextProfile);
+
+      const summary = [
+        autofill.extractedSkills ? `${autofill.extractedSkills} skills` : "",
+        autofill.extractedProjects ? `${autofill.extractedProjects} projects` : "",
+        autofill.extractedExperiences ? `${autofill.extractedExperiences} experiences` : "",
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      setSuccess(
+        `Resume uploaded and profile autofilled${summary ? ` with ${summary}` : ""}.`
+      );
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message || requestError.message || "Unable to parse resume."
+      );
+    } finally {
+      setParsingResume(false);
+      event.target.value = "";
+    }
   };
 
   const saveProfile = async () => {
@@ -244,6 +409,15 @@ function Profile() {
           description: project.description,
           link: project.link,
         })),
+        experiences: form.experiences.map((experience) => ({
+          title: experience.title,
+          company: experience.company,
+          type: experience.type,
+          duration: experience.duration,
+          location: experience.location,
+          description: experience.description,
+          link: experience.link,
+        })),
         resume: form.resume,
         githubUrl: form.githubUrl,
         leetcodeUrl: form.leetcodeUrl,
@@ -258,24 +432,8 @@ function Profile() {
       setSavedProfile(nextSavedProfile);
       setForm(nextSavedProfile);
       syncStudentProfileCache(nextSavedProfile);
+      syncStoredUserFromProfile(nextSavedProfile);
       setIsEditing(false);
-
-      const existingUser = getStoredUser();
-      if (existingUser) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            ...existingUser,
-            name: nextSavedProfile.name,
-            email: nextSavedProfile.email,
-            github: nextSavedProfile.githubUrl,
-            leetcode: nextSavedProfile.leetcodeUrl,
-            gfg: nextSavedProfile.gfgUrl,
-            linkedin: nextSavedProfile.linkedinUrl,
-            portfolio: nextSavedProfile.portfolioUrl,
-          })
-        );
-      }
 
       setSuccess("Profile updated successfully.");
     } catch (requestError) {
@@ -344,6 +502,10 @@ function Profile() {
             <strong>{form.projects.length}</strong>
           </div>
           <div className="profile-summary-card">
+            <span>Experience</span>
+            <strong>{form.experiences.length}</strong>
+          </div>
+          <div className="profile-summary-card">
             <span>Resume</span>
             <strong>{form.resume?.fileName ? "Uploaded" : "Missing"}</strong>
           </div>
@@ -408,12 +570,19 @@ function Profile() {
                 />
               </label>
               <label>
-                Year
-                <input
+                Course Duration
+                <select
                   value={form.year}
                   onChange={(event) => updateField("year", event.target.value)}
-                  readOnly={isReadOnly}
-                />
+                  disabled={isReadOnly}
+                >
+                  <option value="">Select course duration</option>
+                  {courseDurationOptions.map((duration) => (
+                    <option key={duration} value={duration}>
+                      {duration}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label>
                 Experience Level
@@ -489,15 +658,24 @@ function Profile() {
                 Resume Upload
                 <input
                   type="file"
-                  accept=".pdf,.doc,.docx"
+                  accept=".pdf,.docx,.txt"
                   onChange={handleResumeUpload}
-                  disabled={isReadOnly}
+                  disabled={loading || saving || parsingResume}
                 />
               </label>
             </div>
 
             <div className="resume-box">
-              <strong>{form.resume?.fileName || "No resume uploaded yet"}</strong>
+              <div>
+                <strong>
+                  {parsingResume
+                    ? "Parsing resume and autofilling profile..."
+                    : form.resume?.fileName || "No resume uploaded yet"}
+                </strong>
+                <p className="resume-box-copy">
+                  Upload a PDF, DOCX, or TXT resume to autofill skills, projects, experience, education, and social links.
+                </p>
+              </div>
               {form.resume?.dataUrl && (
                 <a href={form.resume.dataUrl} download={form.resume.fileName || "resume"}>
                   Download Resume
@@ -560,6 +738,184 @@ function Profile() {
           <section className="profile-form-card full-span">
             <div className="profile-section-head">
               <div>
+                <h2>Experience and Internships</h2>
+                <p>Internship and experience details can now be autofilled from your uploaded resume.</p>
+              </div>
+            </div>
+
+            {isEditing && (
+              <div className="experience-form-grid">
+                <input
+                  placeholder="Role or internship title"
+                  value={newExperience.title}
+                  onChange={(event) =>
+                    setNewExperience((current) => ({ ...current, title: event.target.value }))
+                  }
+                />
+                <input
+                  placeholder="Company or organization"
+                  value={newExperience.company}
+                  onChange={(event) =>
+                    setNewExperience((current) => ({ ...current, company: event.target.value }))
+                  }
+                />
+                <select
+                  value={newExperience.type}
+                  onChange={(event) =>
+                    setNewExperience((current) => ({ ...current, type: event.target.value }))
+                  }
+                >
+                  <option value="internship">Internship</option>
+                  <option value="fulltime">Full Time</option>
+                  <option value="parttime">Part Time</option>
+                  <option value="contract">Contract</option>
+                  <option value="freelance">Freelance</option>
+                  <option value="leadership">Leadership</option>
+                  <option value="other">Other</option>
+                </select>
+                <input
+                  placeholder="Duration"
+                  value={newExperience.duration}
+                  onChange={(event) =>
+                    setNewExperience((current) => ({ ...current, duration: event.target.value }))
+                  }
+                />
+                <input
+                  placeholder="Location"
+                  value={newExperience.location}
+                  onChange={(event) =>
+                    setNewExperience((current) => ({ ...current, location: event.target.value }))
+                  }
+                />
+                <input
+                  placeholder="Project or certificate link"
+                  value={newExperience.link}
+                  onChange={(event) =>
+                    setNewExperience((current) => ({ ...current, link: event.target.value }))
+                  }
+                />
+                <textarea
+                  placeholder="What you worked on"
+                  value={newExperience.description}
+                  onChange={(event) =>
+                    setNewExperience((current) => ({
+                      ...current,
+                      description: event.target.value,
+                    }))
+                  }
+                />
+                <button type="button" onClick={addExperience}>
+                  Add Experience
+                </button>
+              </div>
+            )}
+
+            <div className="experience-list">
+              {form.experiences.length > 0 ? (
+                form.experiences.map((experience) => {
+                  const experienceId = experience._id || experience.id;
+
+                  return (
+                    <article key={experienceId} className="project-card-v2 experience-card">
+                      <div className="project-card-main">
+                        {isEditing ? (
+                          <div className="experience-card-editor">
+                            <div className="experience-card-editor-grid">
+                              <input
+                                placeholder="Role or internship title"
+                                value={experience.title}
+                                onChange={(event) =>
+                                  updateExperience(experienceId, "title", event.target.value)
+                                }
+                              />
+                              <input
+                                placeholder="Company or organization"
+                                value={experience.company || ""}
+                                onChange={(event) =>
+                                  updateExperience(experienceId, "company", event.target.value)
+                                }
+                              />
+                              <select
+                                value={experience.type || "other"}
+                                onChange={(event) =>
+                                  updateExperience(experienceId, "type", event.target.value)
+                                }
+                              >
+                                <option value="internship">Internship</option>
+                                <option value="fulltime">Full Time</option>
+                                <option value="parttime">Part Time</option>
+                                <option value="contract">Contract</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="leadership">Leadership</option>
+                                <option value="other">Other</option>
+                              </select>
+                              <input
+                                placeholder="Duration"
+                                value={experience.duration || ""}
+                                onChange={(event) =>
+                                  updateExperience(experienceId, "duration", event.target.value)
+                                }
+                              />
+                              <input
+                                placeholder="Location"
+                                value={experience.location || ""}
+                                onChange={(event) =>
+                                  updateExperience(experienceId, "location", event.target.value)
+                                }
+                              />
+                              <input
+                                placeholder="Project or certificate link"
+                                value={experience.link || ""}
+                                onChange={(event) =>
+                                  updateExperience(experienceId, "link", event.target.value)
+                                }
+                              />
+                            </div>
+                            <textarea
+                              placeholder="What you worked on"
+                              value={experience.description || ""}
+                              onChange={(event) =>
+                                updateExperience(experienceId, "description", event.target.value)
+                              }
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <strong>{experience.title}</strong>
+                            <p className="experience-meta">
+                              {[experience.company, experience.duration, experience.location]
+                                .filter(Boolean)
+                                .join(" • ") || experience.type}
+                            </p>
+                            {experience.description && <p>{experience.description}</p>}
+                            {experience.link && (
+                              <a href={experience.link} target="_blank" rel="noreferrer">
+                                {experience.link}
+                              </a>
+                            )}
+                          </>
+                        )}
+                      </div>
+
+                      {isEditing && (
+                        <button type="button" onClick={() => removeExperience(experienceId)}>
+                          Remove
+                        </button>
+                      )}
+                    </article>
+                  );
+                })
+              ) : (
+                <p className="muted-copy">
+                  Upload a resume or add experience manually to keep internship details on your profile.
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section className="profile-form-card full-span">
+            <div className="profile-section-head">
+              <div>
                 <h2>Projects</h2>
                 <p>Saved projects are shown in your profile and can also support the dashboard.</p>
               </div>
@@ -601,13 +957,41 @@ function Profile() {
 
                   return (
                     <article key={projectId} className="project-card-v2">
-                      <div>
-                        <strong>{project.title}</strong>
-                        <p>{project.description}</p>
-                        {project.link && (
-                          <a href={project.link} target="_blank" rel="noreferrer">
-                            {project.link}
-                          </a>
+                      <div className="project-card-main">
+                        {isEditing ? (
+                          <div className="project-card-editor">
+                            <input
+                              placeholder="Project title"
+                              value={project.title}
+                              onChange={(event) =>
+                                updateProject(projectId, "title", event.target.value)
+                              }
+                            />
+                            <input
+                              placeholder="Project link"
+                              value={project.link || ""}
+                              onChange={(event) =>
+                                updateProject(projectId, "link", event.target.value)
+                              }
+                            />
+                            <textarea
+                              placeholder="Project description"
+                              value={project.description}
+                              onChange={(event) =>
+                                updateProject(projectId, "description", event.target.value)
+                              }
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <strong>{project.title}</strong>
+                            <p>{project.description}</p>
+                            {project.link && (
+                              <a href={project.link} target="_blank" rel="noreferrer">
+                                {project.link}
+                              </a>
+                            )}
+                          </>
                         )}
                       </div>
 

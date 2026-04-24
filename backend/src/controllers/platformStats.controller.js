@@ -96,6 +96,15 @@ const normalizeGitHubToken = (rawValue = '') => {
 const isUnauthorizedError = (error) =>
   error?.status === 401 || /status 401/i.test(error?.message || '');
 
+const isForbiddenError = (error) =>
+  error?.status === 403 || /status 403/i.test(error?.message || '');
+
+const createGitHubSyncError = (message, status) => {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+};
+
 const parseNumber = (value = '') => {
   const normalized = String(value).replace(/[^\d.]/g, '');
 
@@ -128,6 +137,15 @@ const safeTextFetch = async (url, options = {}) => {
   }
 
   return response.text();
+};
+
+const withOptionalGitHubData = async (promise, fallbackValue, label) => {
+  try {
+    return await promise;
+  } catch (error) {
+    console.error(`${label} failed:`, error.message || error);
+    return fallbackValue;
+  }
 };
 
 const calculateDayStreak = (countMap = new Map()) => {
@@ -259,13 +277,22 @@ const fetchGitHubStats = async (username, githubToken = '') => {
 
   const [user, events, repos, contributionSnapshot] = await Promise.all([
     safeJsonFetch(`${GITHUB_API_URL}/users/${username}`, { headers }),
-    safeJsonFetch(eventsEndpoint, { headers }),
-    safeJsonFetch(`${GITHUB_API_URL}/users/${username}/repos?sort=updated&per_page=6`, { headers }),
+    withOptionalGitHubData(
+      safeJsonFetch(eventsEndpoint, { headers }),
+      [],
+      'GitHub events sync'
+    ),
+    withOptionalGitHubData(
+      safeJsonFetch(`${GITHUB_API_URL}/users/${username}/repos?sort=updated&per_page=6`, { headers }),
+      [],
+      'GitHub repos sync'
+    ),
     githubToken
-      ? fetchGitHubContributionSnapshot(username, githubToken).catch((error) => {
-          console.error('GitHub contribution snapshot failed:', error.message || error);
-          return null;
-        })
+      ? withOptionalGitHubData(
+          fetchGitHubContributionSnapshot(username, githubToken),
+          null,
+          'GitHub contribution snapshot'
+        )
       : Promise.resolve(null),
   ]);
 
@@ -363,6 +390,13 @@ const getGitHubStats = async (rawValue = '') => {
     if (githubToken && isUnauthorizedError(error)) {
       console.error('GitHub token rejected, retrying with public API:', error.message || error);
       return fetchGitHubStats(username, '');
+    }
+
+    if (isForbiddenError(error)) {
+      throw createGitHubSyncError(
+        'GitHub rate limit reached for the backend API. Add GITHUB_API_TOKEN to the backend to make GitHub sync reliable.',
+        403
+      );
     }
 
     throw error;
