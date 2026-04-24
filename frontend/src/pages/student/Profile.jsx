@@ -337,6 +337,11 @@ function Profile() {
   };
 
   const handleResumeUpload = async (event) => {
+    if (!isEditing || loading || saving || parsingResume) {
+      event.target.value = "";
+      return;
+    }
+
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -660,7 +665,7 @@ function Profile() {
                   type="file"
                   accept=".pdf,.docx,.txt"
                   onChange={handleResumeUpload}
-                  disabled={loading || saving || parsingResume}
+                  disabled={isReadOnly || parsingResume}
                 />
               </label>
             </div>
@@ -673,7 +678,9 @@ function Profile() {
                     : form.resume?.fileName || "No resume uploaded yet"}
                 </strong>
                 <p className="resume-box-copy">
-                  Upload a PDF, DOCX, or TXT resume to autofill skills, projects, experience, education, and social links.
+                  {isEditing
+                    ? "Upload a PDF, DOCX, or TXT resume to autofill skills, projects, experience, education, and social links."
+                    : "Switch to edit mode to upload a PDF, DOCX, or TXT resume and autofill your profile."}
                 </p>
               </div>
               {form.resume?.dataUrl && (
