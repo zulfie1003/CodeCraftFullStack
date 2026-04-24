@@ -14,6 +14,10 @@ import {
   Sun,
   Menu,
   X as XClose,
+  ExternalLink,
+  Brain,
+  Network,
+  MessagesSquare,
 } from "lucide-react";
 import {
   LANGUAGES,
@@ -208,6 +212,30 @@ const MODULE_CATEGORIES = [
 ];
 
 const SUBMISSIONS_STORAGE_KEY = "practice-submissions-v1";
+
+const INTERVIEW_PREP_RESOURCE = {
+  title: "Interview Prep Hub",
+  url: "https://aibot-murex.vercel.app/",
+  description:
+    "Want to go beyond coding questions? This external practice hub helps students prepare for interviews with focused support for logic building, DSA preparation, and system design thinking.",
+  highlights: [
+    {
+      icon: Brain,
+      title: "Logic and DSA prep",
+      text: "Use it to strengthen problem-solving, core DSA patterns, and interview-style coding confidence.",
+    },
+    {
+      icon: MessagesSquare,
+      title: "Interview practice flow",
+      text: "Students can explore guided preparation when they want extra interview support outside the code editor.",
+    },
+    {
+      icon: Network,
+      title: "System design revision",
+      text: "It is also useful for learners who want to understand bigger-picture architecture and system design basics.",
+    },
+  ],
+};
 
 const loadSubmittedProblems = () => {
   if (typeof window === "undefined") {
@@ -590,6 +618,44 @@ function Practice() {
                   <div className="stat-item">
                     <span className="stat-label">Acceptance Rate</span>
                     <span className="stat-value">52.9%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="description-section">
+                <h2 className="section-title">{INTERVIEW_PREP_RESOURCE.title}</h2>
+                <div className="practice-resource-card">
+                  <div className="practice-resource-header">
+                    <div>
+                      <span className="practice-resource-kicker">External Practice Resource</span>
+                      <h3 className="practice-resource-title">AI interview, DSA, and system design support</h3>
+                    </div>
+                    <a
+                      className="practice-resource-link"
+                      href={INTERVIEW_PREP_RESOURCE.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Visit Website <ExternalLink size={15} />
+                    </a>
+                  </div>
+
+                  <p className="practice-resource-description">
+                    {INTERVIEW_PREP_RESOURCE.description}
+                  </p>
+
+                  <div className="practice-resource-grid">
+                    {INTERVIEW_PREP_RESOURCE.highlights.map(({ icon: Icon, title, text }) => (
+                      <article key={title} className="practice-resource-item">
+                        <span className="practice-resource-icon">
+                          <Icon size={18} />
+                        </span>
+                        <div>
+                          <h4>{title}</h4>
+                          <p>{text}</p>
+                        </div>
+                      </article>
+                    ))}
                   </div>
                 </div>
               </div>
