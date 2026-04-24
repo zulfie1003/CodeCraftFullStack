@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -7,6 +8,7 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
+import api from "../api/axios";
 import "../styles/landing.css";
 
 const HUMAN_AI_CYCLE = [
@@ -114,8 +116,36 @@ const AI_GROWTH_PRINCIPLES = [
   },
 ];
 
+const formatLearnerCount = (count) => new Intl.NumberFormat("en-IN").format(count);
+
 function Landing() {
   const navigate = useNavigate();
+  const [learnerCount, setLearnerCount] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPublicStats = async () => {
+      try {
+        const response = await api.get("/users/public-stats");
+        const nextCount = Number(response?.data?.data?.learners);
+
+        if (isMounted) {
+          setLearnerCount(Number.isFinite(nextCount) ? nextCount : 0);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setLearnerCount(0);
+        }
+      }
+    };
+
+    loadPublicStats();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="landing">
@@ -253,7 +283,7 @@ function Landing() {
       <section className="stats">
         <div className="stats-card-modern">
           <span className="stats-kicker">Learners</span>
-          <h2>10K+</h2>
+          <h2>{learnerCount === null ? "..." : formatLearnerCount(learnerCount)}</h2>
           <p>Students building consistent coding and project habits.</p>
         </div>
         <div className="stats-card-modern">

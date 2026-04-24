@@ -137,6 +137,37 @@ export const updateProfile = async (req, res, next) => {
 
 export const saveProfile = updateProfile;
 
+export const getPublicUserStats = async (req, res, next) => {
+  try {
+    const [result] = await User.aggregate([
+      {
+        $match: {
+          role: 'student',
+          email: { $type: 'string', $ne: '' },
+        },
+      },
+      {
+        $group: {
+          _id: { $toLower: '$email' },
+        },
+      },
+      {
+        $count: 'learners',
+      },
+    ]);
+
+    sendSuccess(
+      res,
+      {
+        learners: result?.learners || 0,
+      },
+      'Public user stats fetched successfully'
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
