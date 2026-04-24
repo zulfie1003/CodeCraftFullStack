@@ -15,5 +15,13 @@ export default defineConfig({
     port: 5173,
     host: "localhost",
     open: "Brave Browser",
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+    },
+  },
+  preview: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+    },
   },
 });

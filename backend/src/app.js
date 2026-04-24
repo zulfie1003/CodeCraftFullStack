@@ -34,7 +34,13 @@ app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
 
 // Security headers
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: {
+      policy: "same-origin-allow-popups",
+    },
+  })
+);
 
 // Logger
 app.use(morgan("dev"));
