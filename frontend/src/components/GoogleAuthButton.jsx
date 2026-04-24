@@ -66,8 +66,6 @@ const initializeGoogleIdentity = (clientId, onCredential) => {
 
   window.google.accounts.id.initialize({
     client_id: clientId,
-    // Prefer FedCM button UX where supported to reduce popup-window messaging issues.
-    use_fedcm_for_button: true,
     callback: (response) => getGoogleIdentityState().activeCredentialHandler?.(response),
   });
 
