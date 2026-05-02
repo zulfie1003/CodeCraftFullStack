@@ -27,6 +27,8 @@ import OrganizerHackathons from "./pages/organizer/Hackathons.jsx";
 import Participants from "./pages/organizer/Participants.jsx";
 import OrganizerProfile from "./pages/organizer/OrganizerProfile.jsx";
 import { getHomePathForRole, getStoredUser } from "./utils/auth";
+import "./styles/light-mode-overrides.css";
+import "./styles/interaction-system.css";
 
 function FallbackRedirect() {
   const user = getStoredUser();

@@ -4,6 +4,7 @@ import api from "../api/axios";
 import AuthShowcase from "./AuthShowcase";
 import AuthRoleSelector from "./AuthRoleSelector";
 import GoogleAuthButton from "./GoogleAuthButton";
+import useScrollReveal from "../hooks/useScrollReveal";
 import { getHomePathForRole, storeAuthSession } from "../utils/auth";
 
 import "../styles/auth.css";
@@ -85,6 +86,7 @@ const ROLE_OPTIONS = [
 
 function Login() {
   const navigate = useNavigate();
+  useScrollReveal();
 
   const [mode, setMode] = useState("login");
   const [role, setRole] = useState("student");

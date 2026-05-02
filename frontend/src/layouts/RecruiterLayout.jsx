@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import { ThemeProvider, ThemeContext } from "../context/ThemeContext";
+import useScrollReveal from "../hooks/useScrollReveal";
 import "../styles/recruiter.css";
 import "../styles/theme.css";
 import { clearStoredAuth, getStoredUser } from "../utils/auth";
@@ -11,6 +12,7 @@ const RecruiterLayoutContent = ({ children }) => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const user = getStoredUser();
+  useScrollReveal();
 
   const logout = () => {
     clearStoredAuth();

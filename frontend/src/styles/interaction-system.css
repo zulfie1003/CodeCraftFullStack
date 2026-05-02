@@ -1,0 +1,311 @@
+:root {
+  --ui-surface-hover-y: 6px;
+  --ui-surface-hover-border: rgba(125, 211, 252, 0.26);
+  --ui-surface-hover-shadow: 0 24px 56px rgba(15, 23, 42, 0.22);
+  --ui-button-hover-shadow: 0 18px 34px rgba(15, 23, 42, 0.2);
+  --ui-button-focus-ring: rgba(96, 165, 250, 0.28);
+  --ui-button-active-scale: 0.97;
+}
+
+[data-theme="light"] {
+  --ui-surface-hover-border: rgba(48, 86, 245, 0.22);
+  --ui-surface-hover-shadow: 0 26px 56px rgba(73, 90, 179, 0.16);
+  --ui-button-hover-shadow: 0 18px 36px rgba(73, 90, 179, 0.18);
+  --ui-button-focus-ring: rgba(48, 86, 245, 0.18);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+:is(
+  .page-intro,
+  .profile-page-header,
+  .profile-summary-card,
+  .profile-form-card,
+  .resume-box,
+  .project-card-v2,
+  .dashboard-action-card,
+  .stat-card,
+  .sd-card,
+  .sd-glass,
+  .dashboard-hero-card,
+  .dashboard-side-card,
+  .dashboard-panel,
+  .dashboard-stat-card,
+  .dashboard-profile-card,
+  .dashboard-platform-card,
+  .dashboard-repo-card,
+  .dashboard-skill-box,
+  .summary-card,
+  .job-card,
+  .sidebar-card,
+  .priority-card,
+  .mentor-card,
+  .booking-box,
+  .session-box,
+  .hackathon-card,
+  .glass-card,
+  .problem-card,
+  .module-tab,
+  .practice-resource-card,
+  .description-section,
+  .example-card,
+  .format-card,
+  .analysis-card,
+  .test-case-item,
+  .create-form,
+  .registration-form,
+  .applicant-card,
+  .team-editor-card,
+  .candidate-project-card,
+  .event-rule-box,
+  .auth-showcase-card,
+  .auth-metric-card,
+  .auth-highlight-card,
+  .auth-card,
+  .landing-page .hero-visual-card,
+  .landing-page .info-card,
+  .landing-page .feature-card,
+  .landing-page .skill-card,
+  .landing-page .testimonial-card,
+  .landing-page .step-card,
+  .landing-page .result-card,
+  .landing-page .results-panel,
+  .landing-page .cta-panel,
+  .landing-page .lesson-card,
+  .landing-page .mini-stat-card,
+  .landing-page .project-checklist,
+  .landing-page .support-card,
+  .landing-page .visual-sidebar
+) {
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease,
+    background-color 0.28s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  :is(
+    .page-intro,
+    .profile-page-header,
+    .profile-summary-card,
+    .profile-form-card,
+    .resume-box,
+    .project-card-v2,
+    .dashboard-action-card,
+    .stat-card,
+    .sd-card,
+    .sd-glass,
+    .dashboard-hero-card,
+    .dashboard-side-card,
+    .dashboard-panel,
+    .dashboard-stat-card,
+    .dashboard-profile-card,
+    .dashboard-platform-card,
+    .dashboard-repo-card,
+    .dashboard-skill-box,
+    .summary-card,
+    .job-card,
+    .sidebar-card,
+    .priority-card,
+    .mentor-card,
+    .booking-box,
+    .session-box,
+    .hackathon-card,
+    .glass-card,
+    .problem-card,
+    .module-tab,
+    .practice-resource-card,
+    .description-section,
+    .example-card,
+    .format-card,
+    .analysis-card,
+    .test-case-item,
+    .create-form,
+    .registration-form,
+    .applicant-card,
+    .team-editor-card,
+    .candidate-project-card,
+    .event-rule-box,
+    .auth-showcase-card,
+    .auth-metric-card,
+    .auth-highlight-card,
+    .auth-card,
+    .landing-page .hero-visual-card,
+    .landing-page .info-card,
+    .landing-page .feature-card,
+    .landing-page .skill-card,
+    .landing-page .testimonial-card,
+    .landing-page .step-card,
+    .landing-page .result-card,
+    .landing-page .results-panel,
+    .landing-page .cta-panel,
+    .landing-page .lesson-card,
+    .landing-page .mini-stat-card,
+    .landing-page .project-checklist,
+    .landing-page .support-card,
+    .landing-page .visual-sidebar
+  ):is(:hover, :focus-within) {
+    transform: translateY(calc(var(--ui-surface-hover-y) * -1));
+    border-color: var(--ui-surface-hover-border);
+    box-shadow: var(--ui-surface-hover-shadow);
+  }
+
+  :where(
+    button,
+    .file-input-label,
+    .auth-back-link,
+    .auth-showcase-link,
+    .landing-page .btn-primary,
+    .landing-page .btn-secondary,
+    .landing-page .btn-ghost,
+    .landing-page .text-link
+  ):not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ui-button-hover-shadow);
+  }
+}
+
+:where(
+  button,
+  .file-input-label,
+  .auth-back-link,
+  .auth-showcase-link,
+  .landing-page .btn-primary,
+  .landing-page .btn-secondary,
+  .landing-page .btn-ghost,
+  .landing-page .text-link
+) {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+  transform-origin: center;
+}
+
+:where(
+  button,
+  .file-input-label,
+  .auth-back-link,
+  .auth-showcase-link,
+  .landing-page .btn-primary,
+  .landing-page .btn-secondary,
+  .landing-page .btn-ghost,
+  .landing-page .text-link
+):not(:disabled):active {
+  transform: translateY(0) scale(var(--ui-button-active-scale));
+}
+
+:where(button, .file-input-label):focus-visible {
+  outline: 3px solid var(--ui-button-focus-ring);
+  outline-offset: 3px;
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0) scale(0.985);
+  filter: blur(10px);
+  transition:
+    opacity 0.7s ease var(--reveal-delay, 0ms),
+    transform 0.7s ease var(--reveal-delay, 0ms),
+    filter 0.7s ease var(--reveal-delay, 0ms);
+}
+
+.reveal-on-scroll.reveal-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  :is(
+    .page-intro,
+    .profile-page-header,
+    .profile-summary-card,
+    .profile-form-card,
+    .resume-box,
+    .project-card-v2,
+    .dashboard-action-card,
+    .stat-card,
+    .sd-card,
+    .sd-glass,
+    .dashboard-hero-card,
+    .dashboard-side-card,
+    .dashboard-panel,
+    .dashboard-stat-card,
+    .dashboard-profile-card,
+    .dashboard-platform-card,
+    .dashboard-repo-card,
+    .dashboard-skill-box,
+    .summary-card,
+    .job-card,
+    .sidebar-card,
+    .priority-card,
+    .mentor-card,
+    .booking-box,
+    .session-box,
+    .hackathon-card,
+    .glass-card,
+    .problem-card,
+    .module-tab,
+    .practice-resource-card,
+    .description-section,
+    .example-card,
+    .format-card,
+    .analysis-card,
+    .test-case-item,
+    .create-form,
+    .registration-form,
+    .applicant-card,
+    .team-editor-card,
+    .candidate-project-card,
+    .event-rule-box,
+    .auth-showcase-card,
+    .auth-metric-card,
+    .auth-highlight-card,
+    .auth-card,
+    .landing-page .hero-visual-card,
+    .landing-page .info-card,
+    .landing-page .feature-card,
+    .landing-page .skill-card,
+    .landing-page .testimonial-card,
+    .landing-page .step-card,
+    .landing-page .result-card,
+    .landing-page .results-panel,
+    .landing-page .cta-panel,
+    .landing-page .lesson-card,
+    .landing-page .mini-stat-card,
+    .landing-page .project-checklist,
+    .landing-page .support-card,
+    .landing-page .visual-sidebar,
+    button,
+    .file-input-label,
+    .auth-back-link,
+    .auth-showcase-link,
+    .landing-page .btn-primary,
+    .landing-page .btn-secondary,
+    .landing-page .btn-ghost,
+    .landing-page .text-link,
+    .reveal-on-scroll
+  ) {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .reveal-on-scroll,
+  .reveal-on-scroll.reveal-visible {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}

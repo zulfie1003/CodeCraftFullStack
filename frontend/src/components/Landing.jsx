@@ -1,349 +1,407 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
+  Bot,
   BriefcaseBusiness,
+  CalendarDays,
+  CheckCircle2,
   Code2,
   Github,
+  GraduationCap,
+  LayoutDashboard,
+  Map,
   Sparkles,
-  Target,
+  Trophy,
+  Users,
 } from "lucide-react";
-import api from "../api/axios";
+
 import "../styles/landing.css";
 
-const HUMAN_AI_CYCLE = [
+const NAV_ITEMS = [
+  { label: "Platform", target: "platform" },
+  { label: "Workflow", target: "workflow" },
+  { label: "Outcomes", target: "outcomes" },
+  { label: "Roles", target: "roles" },
+];
+
+const ROLE_CARDS = [
   {
-    step: "01",
-    phase: "Connect",
-    title: "Understand the AI era with curiosity.",
-    description:
-      "The first move is not fear or hype. It is learning what AI changes, where it helps, and where human thinking still leads.",
-    note: "Awareness comes before acceleration.",
-    icon: Sparkles,
-    tone: "mint",
+    icon: GraduationCap,
+    title: "Students",
+    text: "Practice coding, follow roadmaps, build a portfolio, and move toward job-ready proof.",
+    meta: "Practice + Roadmap",
+    accent: "accent-blue",
   },
   {
-    step: "02",
-    phase: "Learn",
-    title: "Build strong human fundamentals.",
-    description:
-      "Logic, communication, coding, systems thinking, and problem framing are what make AI useful instead of confusing.",
-    note: "Fundamentals are the real multiplier.",
-    icon: Code2,
-    tone: "emerald",
-  },
-  {
-    step: "03",
-    phase: "Collaborate",
-    title: "Work with AI, but keep human judgment.",
-    description:
-      "Use AI to explore ideas, speed up execution, and debug faster, but verify outputs, test decisions, and own the final result.",
-    note: "Speed matters only when accuracy stays intact.",
-    icon: Target,
-    tone: "soft",
-  },
-  {
-    step: "04",
-    phase: "Grow",
-    title: "Turn progress into visible proof.",
-    description:
-      "Projects, GitHub activity, portfolios, and shipped work show how a person grows with AI instead of being replaced by it.",
-    note: "Proof creates trust and opportunity.",
     icon: BriefcaseBusiness,
-    tone: "forest",
+    title: "Recruiters",
+    text: "Post opportunities, review applicants, and spot candidates with visible learning signals.",
+    meta: "Jobs + Applicants",
+    accent: "accent-purple",
+  },
+  {
+    icon: CalendarDays,
+    title: "Organizers",
+    text: "Create hackathons, manage participants, and run events from one focused workspace.",
+    meta: "Events + Teams",
+    accent: "accent-violet",
+  },
+  {
+    icon: Bot,
+    title: "AI Mentoring",
+    text: "Keep guidance close to the work with mentor support that connects goals to next steps.",
+    meta: "Support + Signals",
+    accent: "accent-indigo",
   },
 ];
 
-const WORKFLOW_STEPS = [
-  {
-    icon: Sparkles,
-    title: "Plan with clarity",
-    description: "Use AI roadmaps to turn a broad goal into weekly direction.",
-  },
+const FEATURES = [
   {
     icon: Code2,
-    title: "Practice with feedback",
-    description: "Code, test, debug, and build rhythm without leaving the workspace.",
+    title: "Coding practice",
+    text: "Solve structured problems, run code, and keep execution results beside the prompt.",
+  },
+  {
+    icon: Map,
+    title: "Roadmaps",
+    text: "Turn broad career goals into focused learning paths with visible progress.",
   },
   {
     icon: Github,
-    title: "Show real proof",
-    description: "Convert GitHub activity and projects into visible portfolio signal.",
-  },
-  {
-    icon: BriefcaseBusiness,
-    title: "Move toward jobs",
-    description: "Track skill fit and focus on what actually improves hiring readiness.",
+    title: "Portfolio signal",
+    text: "Bring projects, GitHub activity, and profile readiness into the same career story.",
   },
 ];
 
-const HERO_QUOTES = [
+const STEPS = [
   {
-    slot: "preview-top",
-    label: "AI Quote",
-    quote: "AI works best when curious people use it with intent.",
-    note: "Direction still matters more than shortcuts.",
+    title: "Pick your role",
+    text: "Start in the workspace that matches how you learn, hire, or organize.",
   },
   {
-    slot: "preview-bottom",
-    label: "Builder Quote",
-    quote: "Code becomes powerful when it turns learning into proof.",
-    note: "Projects, streaks, and iteration tell the real story.",
+    title: "Build the signal",
+    text: "Practice, projects, jobs, and events all feed a clearer profile of progress.",
   },
   {
-    slot: "preview-side",
-    label: "Career Quote",
-    quote: "A strong portfolio is a record of shipped decisions.",
-    note: "Show momentum, not just the final screen.",
+    title: "Act from one hub",
+    text: "Move from roadmaps to applications or participant management without context switching.",
+  },
+  {
+    title: "Track outcomes",
+    text: "Use dashboards and profiles to keep next actions visible and measurable.",
   },
 ];
 
-const AI_GROWTH_PRINCIPLES = [
-  {
-    tag: "Human Edge",
-    quote: "In the AI era, your advantage is not typing more. It is thinking clearer and learning faster.",
-    note: "CodeCraft is built to strengthen that edge.",
-  },
-  {
-    tag: "Learning",
-    quote: "The goal is not to compete with AI. The goal is to become the person who can direct it well.",
-    note: "Human depth makes AI leverage meaningful.",
-  },
-  {
-    tag: "Growth",
-    quote: "Real progress happens when AI support meets human discipline, practice, and consistent reflection.",
-    note: "That is the lifecycle behind the platform.",
-  },
+const SKILLS = [
+  { icon: LayoutDashboard, title: "Unified dashboards", text: "Role-specific dashboards keep the next useful action easy to find." },
+  { icon: Trophy, title: "Hackathon flow", text: "Events, participants, and registration tools live beside learning progress." },
+  { icon: Users, title: "Hiring workspace", text: "Recruiters can connect posted roles to candidate-ready profiles." },
 ];
-
-const formatLearnerCount = (count) => new Intl.NumberFormat("en-IN").format(count);
 
 function Landing() {
   const navigate = useNavigate();
-  const [learnerCount, setLearnerCount] = useState(null);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadPublicStats = async () => {
-      try {
-        const response = await api.get("/users/public-stats");
-        const nextCount = Number(response?.data?.data?.learners);
-
-        if (isMounted) {
-          setLearnerCount(Number.isFinite(nextCount) ? nextCount : 0);
-        }
-      } catch (error) {
-        if (isMounted) {
-          setLearnerCount(0);
-        }
-      }
-    };
-
-    loadPublicStats();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const scrollToSection = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
-    <div className="landing">
-      <nav className="navbar">
-        <div className="logo">
-          <img src="/logo.png" alt="CodeCraft Logo" />
+    <div className="landing-page">
+      <div className="landing-orb orb-left" />
+      <div className="landing-orb orb-right" />
+
+      <header className="landing-header landing-shell">
+        <button type="button" className="landing-brand" onClick={() => scrollToSection("top")}>
+          <img src="/logo.png" alt="CodeCraft logo" />
           <span>CodeCraft</span>
-        </div>
-
-        <button className="btn-primary" onClick={() => navigate("/login")}>
-          Get Started
         </button>
-      </nav>
 
-      <section className="hero">
-        <div className="hero-left">
-          <div className="hero-badge">
-            <Sparkles size={16} />
-            AI-first learning, practice, portfolio, and hiring flow
-          </div>
-
-          <div className="hero-headline-shell">
-            <span className="hero-beam beam-one" />
-            <span className="hero-beam beam-two" />
-
-            <h1 className="hero-title">
-              <span className="hero-title-line">Build Skills.</span>
-              <span className="hero-title-line accent">Track Progress.</span>
-              <span className="hero-title-line">Get Hired.</span>
-            </h1>
-          </div>
-
-          <p className="hero-copy">
-            CodeCraft brings roadmap planning, coding practice, GitHub activity, portfolio
-            building, mentor guidance, and job matching into one modern workspace for students.
-          </p>
-
-          <div className="hero-buttons">
-            <button className="btn-primary hero-cta" onClick={() => navigate("/login")}>
-              Launch Your Workspace <ArrowRight size={17} />
+        <nav className="landing-nav" aria-label="Landing navigation">
+          {NAV_ITEMS.map((item) => (
+            <button key={item.target} type="button" onClick={() => scrollToSection(item.target)}>
+              {item.label}
             </button>
-            <button
-              className="btn-outline hero-cta secondary"
-              onClick={() =>
-                document.getElementById("landing-features")?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Explore Features
-            </button>
-          </div>
+          ))}
+        </nav>
 
-          <div className="hero-proof-grid">
-            <div className="hero-proof-pill">
-              <Code2 size={16} />
-              <span>Live practice + AI hints</span>
-            </div>
-            <div className="hero-proof-pill">
-              <Github size={16} />
-              <span>GitHub-powered dashboard sync</span>
-            </div>
-            <div className="hero-proof-pill">
-              <BriefcaseBusiness size={16} />
-              <span>Portfolio to jobs pipeline</span>
-            </div>
-          </div>
+        <div className="landing-header-actions">
+          <button type="button" className="btn-ghost" onClick={() => navigate("/login")}>
+            Login
+          </button>
+          <button type="button" className="btn-primary" onClick={() => navigate("/register")}>
+            Get started
+          </button>
         </div>
+      </header>
 
-        <div className="hero-right">
-          <div className="hero-visual">
-            <div className="visual-glow glow-a" />
-            <div className="visual-glow glow-b" />
-            <div className="visual-grid" />
+      <main id="top" className="landing-main landing-shell">
+        <section className="hero">
+          <div className="hero-copy">
+            <span className="section-kicker">
+              <Sparkles size={16} />
+              Career workspace
+            </span>
+            <h1>Build skill into proof.</h1>
+            <p>
+              CodeCraft brings practice, roadmaps, portfolios, jobs, and hackathons into one
+              role-aware workspace for students, recruiters, and organizers.
+            </p>
 
-            <article className="preview-panel preview-main preview-copy-card">
-              <div className="preview-head">
-                <span className="preview-chip">CodeCraft OS</span>
-                <span className="preview-meta">AI + Practice + Jobs</span>
+            <div className="hero-actions">
+              <button type="button" className="btn-primary hero-button" onClick={() => navigate("/register")}>
+                Create account
+                <ArrowRight size={18} />
+              </button>
+              <button type="button" className="btn-secondary hero-button" onClick={() => navigate("/login")}>
+                Sign in
+              </button>
+            </div>
+
+            <div className="hero-trust">
+              <CheckCircle2 size={18} />
+              <span>Roadmaps, practice, jobs, and events connected by role.</span>
+            </div>
+
+            <div className="hero-pill-row">
+              <span>AI mentor</span>
+              <span>GitHub signal</span>
+              <span>Hackathons</span>
+            </div>
+          </div>
+
+          <div className="hero-visual-column">
+            <div className="hero-visual-card">
+              <div className="visual-header">
+                <div className="visual-dots">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <span className="visual-label">Student dashboard</span>
               </div>
-              <div className="preview-panel-body">
-                <h3>CodeCraft turns daily effort into visible career progress.</h3>
-                <p>
-                  One system for roadmap planning, coding practice, portfolio proof,
-                  mentor support, and job-focused decision making.
-                </p>
 
-                <div className="signal-step-list">
-                  {WORKFLOW_STEPS.map(({ icon: Icon, title, description }) => (
-                    <article key={title} className="signal-step">
-                      <span className="signal-step-icon">
-                        <Icon size={16} />
-                      </span>
-                      <div>
-                        <strong>{title}</strong>
-                        <p>{description}</p>
+              <div className="visual-body">
+                <aside className="visual-sidebar">
+                  {[
+                    { icon: LayoutDashboard, label: "Home", active: true },
+                    { icon: Code2, label: "Practice" },
+                    { icon: Map, label: "Roadmap" },
+                    { icon: BriefcaseBusiness, label: "Jobs" },
+                  ].map(({ icon: Icon, label, active }) => (
+                    <span key={label} className={`sidebar-item${active ? " active" : ""}`}>
+                      <Icon size={20} />
+                      {label}
+                    </span>
+                  ))}
+                </aside>
+
+                <div className="visual-main">
+                  <div className="visual-top-grid">
+                    <article className="mini-stat-card highlighted">
+                      <span>Readiness</span>
+                      <strong>82%</strong>
+                      <p>Portfolio, practice, and job progress are moving together.</p>
+                      <div className="progress-track">
+                        <span style={{ width: "82%" }} />
                       </div>
                     </article>
-                  ))}
+
+                    <article className="mini-stat-card">
+                      <span>Streak</span>
+                      <strong>14d</strong>
+                      <p>Daily practice keeps the profile story current.</p>
+                      <div className="progress-track">
+                        <span style={{ width: "68%" }} />
+                      </div>
+                    </article>
+                  </div>
+
+                  <article className="lesson-card">
+                    <div className="lesson-card-head">
+                      <div>
+                        <span className="panel-label">Today</span>
+                        <h3>Dynamic programming practice</h3>
+                      </div>
+                      <span className="panel-chip">Medium</span>
+                    </div>
+                    <div className="code-preview">
+                      <span>const solve = (state) =&gt; memo[state] ?? next(state);</span>
+                      <span>return buildSignal(projects, practice, jobs);</span>
+                    </div>
+                    <div className="tag-row">
+                      <span>Portfolio ready</span>
+                      <span>Mentor reviewed</span>
+                    </div>
+                  </article>
+
+                  <div className="visual-bottom-grid">
+                    <article className="project-checklist">
+                      <span className="panel-label">Proof</span>
+                      <ul>
+                        <li><CheckCircle2 size={17} /> GitHub project synced</li>
+                        <li><CheckCircle2 size={17} /> Resume profile updated</li>
+                        <li><CheckCircle2 size={17} /> Job match improved</li>
+                      </ul>
+                    </article>
+
+                    <article className="support-card">
+                      <span className="panel-label">Mentor</span>
+                      <div className="support-row">
+                        <Bot size={18} />
+                        <div>
+                          <strong>Next best step</strong>
+                          <p>Ship one portfolio card from today&apos;s practice result.</p>
+                        </div>
+                      </div>
+                    </article>
+                  </div>
                 </div>
               </div>
-            </article>
 
-            {HERO_QUOTES.map((item) => (
-              <article
-                key={item.label}
-                className={`preview-panel preview-quote-card ${item.slot}`}
-              >
-                <div className="preview-head">
-                  <span className="preview-chip">{item.label}</span>
-                </div>
-                <div className="preview-panel-body">
-                  <span className="quote-mark">"</span>
-                  <p className="signal-quote">{item.quote}</p>
-                  <p className="signal-caption">{item.note}</p>
+              <span className="floating-pill floating-pill-top">Career fit +18%</span>
+              <span className="floating-pill floating-pill-bottom">3 active job paths</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="platform" className="content-section">
+          <div className="section-heading centered">
+            <span className="section-kicker">Platform</span>
+            <h2>One workspace for the whole career loop.</h2>
+            <p>Every role gets tools that feel specific without splitting the experience apart.</p>
+          </div>
+
+          <div className="card-grid card-grid-four">
+            {ROLE_CARDS.map(({ icon: Icon, title, text, meta, accent }) => (
+              <article key={title} className={`info-card ${accent}`}>
+                <span className="info-card-icon"><Icon size={22} /></span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+                <div className="card-meta">
+                  <span>{meta}</span>
+                  <button type="button" className="text-link" onClick={() => navigate("/register")}>
+                    Join
+                  </button>
                 </div>
               </article>
             ))}
+          </div>
+        </section>
 
-            <div className="floating-card floating-card-top">
-              <span className="floating-label">Builder Loop</span>
-              <strong>Plan. Practice. Prove.</strong>
-              <p>CodeCraft keeps your learning flow tied to outcomes that matter.</p>
+        <section id="workflow" className="content-section">
+          <div className="section-heading">
+            <span className="section-kicker">Workflow</span>
+            <h2>From learning work to visible outcomes.</h2>
+            <p>CodeCraft keeps the next task close, whether that means solving, applying, hiring, or organizing.</p>
+          </div>
+
+          <div className="steps-row">
+            {STEPS.map((step, index) => (
+              <article key={step.title} className="step-card">
+                <span className="step-number">Step {index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="outcomes" className="content-section">
+          <div className="results-panel">
+            <div className="section-heading results-heading centered">
+              <span className="section-kicker">Outcomes</span>
+              <h2>Progress that can be read quickly.</h2>
+              <p>Dashboards turn work into practical signals for learners, teams, and hiring flows.</p>
             </div>
 
-            <div className="floating-card floating-card-bottom">
-              <Target size={16} />
-              <div>
-                <strong>Next Move</strong>
-                <p>Learn with focus, ship proof, then apply with context.</p>
-              </div>
+            <div className="results-grid">
+              <article className="result-card">
+                <strong>6+</strong>
+                <span>Connected modules</span>
+                <p>Practice, roadmaps, portfolios, jobs, mentor, and hackathons.</p>
+              </article>
+              <article className="result-card">
+                <strong>3</strong>
+                <span>Role dashboards</span>
+                <p>Students, recruiters, and organizers each get a focused home.</p>
+              </article>
+              <article className="result-card">
+                <strong>1</strong>
+                <span>Career story</span>
+                <p>Learning activity becomes profile evidence without extra ceremony.</p>
+              </article>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="stats">
-        <div className="stats-card-modern">
-          <span className="stats-kicker">Learners</span>
-          <h2>{learnerCount === null ? "..." : formatLearnerCount(learnerCount)}</h2>
-          <p>Students building consistent coding and project habits.</p>
-        </div>
-        <div className="stats-card-modern">
-          <span className="stats-kicker">Workflow</span>
-          <h2>All-in-One</h2>
-          <p>Roadmaps, AI mentor, practice, portfolio, and jobs in one place.</p>
-        </div>
-        <div className="stats-card-modern">
-          <span className="stats-kicker">Outcome</span>
-          <h2>Job Ready</h2>
-          <p>Track the work that actually pushes students toward hiring decisions.</p>
-        </div>
-      </section>
+        <section id="roles" className="content-section">
+          <div className="section-heading centered">
+            <span className="section-kicker">Roles</span>
+            <h2>Built for repeated daily work.</h2>
+            <p>Compact tools, clear state, and practical flows keep the product useful after the first login.</p>
+          </div>
 
-      <section className="lifecycle-section" id="landing-features">
-        <div className="lifecycle-header">
-          <span className="lifecycle-kicker">Human + AI Lifecycle</span>
-          <h2>How people learn, adapt, and grow in an AI-powered world.</h2>
-          <p>
-            CodeCraft is designed around a human journey: understand the shift, build real
-            skills, collaborate with AI carefully, and turn that growth into visible proof.
-          </p>
+          <div className="card-grid card-grid-three compact-grid">
+            {FEATURES.map(({ icon: Icon, title, text }) => (
+              <article key={title} className="feature-card">
+                <span className="feature-icon"><Icon size={22} /></span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
 
-          <div className="lifecycle-pill-row">
-            <span className="lifecycle-pill">Curiosity</span>
-            <span className="lifecycle-pill">Fundamentals</span>
-            <span className="lifecycle-pill">Judgment</span>
-            <span className="lifecycle-pill">Proof</span>
+          <div className="card-grid card-grid-three compact-grid" style={{ marginTop: 20 }}>
+            {SKILLS.map(({ icon: Icon, title, text }) => (
+              <article key={title} className="skill-card">
+                <div className="skill-card-top">
+                  <span className="skill-icon"><Icon size={22} /></span>
+                </div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="cta-panel">
+          <span className="section-kicker">Start building</span>
+          <h2>Open your CodeCraft workspace.</h2>
+          <p>Create an account for your role and move straight into the dashboard designed for it.</p>
+          <button type="button" className="btn-primary cta-button" onClick={() => navigate("/register")}>
+            Get started
+            <ArrowRight size={18} />
+          </button>
+        </section>
+      </main>
+
+      <footer className="landing-footer landing-shell">
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <div className="footer-logo">
+              <img src="/logo.png" alt="CodeCraft logo" />
+              <span>CodeCraft</span>
+            </div>
+            <p>Practice, portfolio, jobs, and hackathons in one role-aware career workspace.</p>
+          </div>
+
+          <div className="footer-links">
+            {[
+              ["Students", "Practice", "Roadmap", "Portfolio"],
+              ["Recruiters", "Jobs", "Applicants", "Company profile"],
+              ["Organizers", "Hackathons", "Participants", "Events"],
+              ["Account", "Login", "Register", "Mentor"],
+            ].map(([heading, ...links]) => (
+              <div key={heading} className="footer-column">
+                <h3>{heading}</h3>
+                {links.map((link) => (
+                  <span key={link}>{link}</span>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
-
-        <div className="lifecycle-track">
-          {HUMAN_AI_CYCLE.map(({ step, phase, title, description, note, icon: Icon, tone }) => (
-            <article key={step} className={`lifecycle-card lifecycle-${tone}`}>
-              <div className="lifecycle-orb">
-                <span className="lifecycle-step">{step}</span>
-              </div>
-
-              <span className="lifecycle-icon">
-                <Icon size={18} />
-              </span>
-
-              <p className="lifecycle-phase">{phase}</p>
-              <h3>{title}</h3>
-              <p className="lifecycle-description">{description}</p>
-              <p className="lifecycle-note">{note}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mindset-strip">
-        {AI_GROWTH_PRINCIPLES.map((item) => (
-          <article key={item.tag} className="mindset-card">
-            <span className="mindset-tag">{item.tag}</span>
-            <p className="mindset-quote">"{item.quote}"</p>
-            <p className="mindset-note">{item.note}</p>
-          </article>
-        ))}
-      </section>
+      </footer>
     </div>
   );
 }

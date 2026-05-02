@@ -1,0 +1,937 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap");
+
+[data-theme="light"] {
+  --primary-color: #3056f5;
+  --primary-dark: #2144da;
+  --primary-light: #6da8ff;
+  --secondary-color: #5b31e8;
+  --secondary-light: #b292ff;
+  --success-color: #3056f5;
+  --success-dark: #2144da;
+  --success-light: #7c93ff;
+  --warning-color: #f59e0b;
+  --warning-dark: #d97706;
+  --warning-light: #facc15;
+  --danger-color: #ef4444;
+  --danger-dark: #dc2626;
+  --danger-light: #f87171;
+  --bg-primary: #f7f9ff;
+  --bg-secondary: rgba(255, 255, 255, 0.84);
+  --bg-tertiary: #eef2ff;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-hover: rgba(48, 86, 245, 0.06);
+  --bg-input: linear-gradient(135deg, #ffffff, #f6f8ff);
+  --text-primary: #13203d;
+  --text-secondary: #2b3a63;
+  --text-tertiary: #475785;
+  --text-muted: #66708f;
+  --border-primary: rgba(48, 86, 245, 0.22);
+  --border-secondary: rgba(88, 101, 242, 0.14);
+  --border-light: rgba(88, 101, 242, 0.08);
+  --shadow-sm: 0 10px 24px rgba(73, 90, 179, 0.08);
+  --shadow-md: 0 18px 40px rgba(73, 90, 179, 0.12);
+  --shadow-lg: 0 28px 64px rgba(73, 90, 179, 0.16);
+  --shadow-primary: 0 18px 36px rgba(72, 82, 214, 0.2);
+  --app-shell-bg:
+    radial-gradient(circle at 10% 12%, rgba(96, 165, 250, 0.18), transparent 30%),
+    radial-gradient(circle at 86% 10%, rgba(168, 85, 247, 0.15), transparent 28%),
+    linear-gradient(180deg, #f7f9ff 0%, #eef3ff 48%, #ffffff 100%);
+  --app-surface: rgba(255, 255, 255, 0.8);
+  --app-card: rgba(255, 255, 255, 0.9);
+  --app-card-strong: #ffffff;
+  --app-border: rgba(88, 101, 242, 0.14);
+  --app-border-strong: rgba(88, 101, 242, 0.22);
+  --app-accent: #3056f5;
+  --app-accent-2: #5b31e8;
+  --app-accent-soft: #eef2ff;
+  --app-text: #13203d;
+  --app-muted: #171a22;
+  --app-shadow: 0 24px 56px rgba(73, 90, 179, 0.12);
+}
+
+html[data-theme="light"],
+[data-theme="light"] body,
+[data-theme="light"] #root {
+  min-height: 100%;
+}
+
+[data-theme="light"] body {
+  background: var(--app-shell-bg) fixed;
+  color: var(--app-text);
+}
+
+[data-theme="light"] body,
+[data-theme="light"] button,
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  font-family: "Manrope", sans-serif;
+}
+
+[data-theme="light"] body * {
+  font-family: "Manrope", sans-serif;
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] .landing-brand span,
+[data-theme="light"] .footer-logo span,
+[data-theme="light"] .sd-logo span,
+[data-theme="light"] .rec-logo-copy strong,
+[data-theme="light"] .org-logo-copy strong {
+  font-family: "Sora", "Manrope", sans-serif;
+}
+
+[data-theme="light"] .code-preview span,
+[data-theme="light"] .code-editor,
+[data-theme="light"] .io-code,
+[data-theme="light"] .inline-code,
+[data-theme="light"] .rich-text code,
+[data-theme="light"] .rich-text pre {
+  font-family: "SFMono-Regular", "Consolas", monospace !important;
+}
+
+[data-theme="light"] .theme-toggle,
+[data-theme="light"] .theme-btn {
+  background: linear-gradient(135deg, var(--app-accent), var(--app-accent-2)) !important;
+  border: 1px solid rgba(88, 101, 242, 0.18) !important;
+  color: #ffffff !important;
+  box-shadow: var(--shadow-primary) !important;
+}
+
+[data-theme="light"] .theme-toggle:hover,
+[data-theme="light"] .theme-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 40px rgba(72, 82, 214, 0.24) !important;
+}
+
+[data-theme="light"] .auth-page {
+  --auth-bg:
+    radial-gradient(circle at 10% 12%, rgba(96, 165, 250, 0.18), transparent 30%),
+    radial-gradient(circle at 82% 14%, rgba(168, 85, 247, 0.16), transparent 28%),
+    linear-gradient(180deg, #f7f9ff 0%, #eef3ff 48%, #ffffff 100%);
+  --auth-surface: rgba(255, 255, 255, 0.84);
+  --auth-card: rgba(255, 255, 255, 0.94);
+  --auth-border: rgba(88, 101, 242, 0.14);
+  --auth-border-strong: rgba(88, 101, 242, 0.24);
+  --auth-text: #13203d;
+  --auth-muted: #66708f;
+  --auth-accent: #3056f5;
+  --auth-accent-strong: #2144da;
+  --auth-accent-soft: #ffffff;
+  --auth-shadow: 0 24px 56px rgba(73, 90, 179, 0.12);
+  --auth-input: rgba(48, 86, 245, 0.04);
+}
+
+[data-theme="light"] .auth-page::before {
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.2), transparent 66%);
+}
+
+[data-theme="light"] .auth-page::after {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.14), transparent 66%);
+}
+
+[data-theme="light"] .auth-showcase,
+[data-theme="light"] .auth-card,
+[data-theme="light"] .auth-metric-card,
+[data-theme="light"] .auth-highlight-card,
+[data-theme="light"] .auth-floating-pill {
+  box-shadow: var(--app-shadow);
+}
+
+[data-theme="light"] .btn-primarys,
+[data-theme="light"] .auth-card button[type="submit"] {
+  background: linear-gradient(135deg, var(--app-accent), var(--app-accent-2)) !important;
+  box-shadow: var(--shadow-primary) !important;
+}
+
+[data-theme="light"] .auth-social-shell {
+  border-color: var(--app-border) !important;
+}
+
+[data-theme="light"] .sd-layout,
+[data-theme="light"] .rec-layout,
+[data-theme="light"] .org-layout {
+  min-height: 100vh;
+  background: var(--app-shell-bg) !important;
+  color: var(--app-text) !important;
+  position: relative;
+  isolation: isolate;
+}
+
+[data-theme="light"] .sd-layout::before,
+[data-theme="light"] .rec-layout::before,
+[data-theme="light"] .org-layout::before,
+[data-theme="light"] .sd-layout::after,
+[data-theme="light"] .rec-layout::after,
+[data-theme="light"] .org-layout::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(18px);
+  z-index: 0;
+}
+
+[data-theme="light"] .sd-layout::before,
+[data-theme="light"] .rec-layout::before,
+[data-theme="light"] .org-layout::before {
+  width: 340px;
+  height: 340px;
+  top: -60px;
+  right: -110px;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.2), transparent 68%);
+}
+
+[data-theme="light"] .sd-layout::after,
+[data-theme="light"] .rec-layout::after,
+[data-theme="light"] .org-layout::after {
+  width: 300px;
+  height: 300px;
+  left: -80px;
+  bottom: 40px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.14), transparent 68%);
+}
+
+[data-theme="light"] .sd-main,
+[data-theme="light"] .rec-main,
+[data-theme="light"] .org-main {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+
+[data-theme="light"] .sd-sidebar,
+[data-theme="light"] .rec-sidebar,
+[data-theme="light"] .org-sidebar {
+  background: rgba(255, 255, 255, 0.78) !important;
+  border-right: 1px solid var(--app-border) !important;
+  box-shadow: 12px 0 36px rgba(73, 90, 179, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+[data-theme="light"] .sd-logo img,
+[data-theme="light"] .rec-logo img,
+[data-theme="light"] .org-logo img {
+  box-shadow: 0 18px 32px rgba(72, 82, 214, 0.16) !important;
+}
+
+[data-theme="light"] .sd-logo span,
+[data-theme="light"] .rec-logo-copy strong,
+[data-theme="light"] .org-logo-copy strong {
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .rec-logo-copy span,
+[data-theme="light"] .org-logo-copy span {
+  color: var(--app-muted) !important;
+}
+
+[data-theme="light"] .sd-sidebar a,
+[data-theme="light"] .rec-nav a,
+[data-theme="light"] .org-sidebar nav a {
+  color: var(--app-muted) !important;
+  border: 1px solid transparent !important;
+}
+
+[data-theme="light"] .sd-sidebar a:hover,
+[data-theme="light"] .rec-nav a:hover,
+[data-theme="light"] .org-sidebar nav a:hover {
+  background: rgba(48, 86, 245, 0.06) !important;
+  border-color: var(--app-border) !important;
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .sd-sidebar a.active,
+[data-theme="light"] .rec-nav a.active,
+[data-theme="light"] .org-sidebar nav a.active {
+  background: linear-gradient(135deg, rgba(48, 86, 245, 0.12), rgba(91, 49, 232, 0.12)) !important;
+  border-color: rgba(88, 101, 242, 0.18) !important;
+  color: var(--app-accent) !important;
+  box-shadow: inset 0 0 0 1px rgba(88, 101, 242, 0.08);
+}
+
+[data-theme="light"] .sd-navbar,
+[data-theme="light"] .rec-header,
+[data-theme="light"] .org-header {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-bottom: 1px solid var(--app-border) !important;
+  box-shadow: 0 10px 30px rgba(73, 90, 179, 0.06);
+  backdrop-filter: blur(18px);
+}
+
+[data-theme="light"] .sd-role,
+[data-theme="light"] .rec-header span,
+[data-theme="light"] .org-header span {
+  color: var(--app-text) !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .hamburger {
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .logout,
+[data-theme="light"] .logout-btn,
+[data-theme="light"] .ghost-btn,
+[data-theme="light"] .bookmark-btn,
+[data-theme="light"] .cancel-btn,
+[data-theme="light"] .cancel-btn-card,
+[data-theme="light"] .avatar-icon-btn,
+[data-theme="light"] .drawer-close-btn,
+[data-theme="light"] .problem-list-btn,
+[data-theme="light"] .navbar-btn,
+[data-theme="light"] .lang-btn,
+[data-theme="light"] .editor-action-btn {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid var(--app-border) !important;
+  color: var(--app-text) !important;
+  box-shadow: 0 10px 24px rgba(73, 90, 179, 0.06);
+}
+
+[data-theme="light"] .logout:hover,
+[data-theme="light"] .logout-btn:hover,
+[data-theme="light"] .ghost-btn:hover,
+[data-theme="light"] .bookmark-btn:hover,
+[data-theme="light"] .cancel-btn:hover,
+[data-theme="light"] .cancel-btn-card:hover,
+[data-theme="light"] .avatar-icon-btn:hover,
+[data-theme="light"] .drawer-close-btn:hover,
+[data-theme="light"] .problem-list-btn:hover,
+[data-theme="light"] .navbar-btn:hover,
+[data-theme="light"] .lang-btn:hover,
+[data-theme="light"] .editor-action-btn:hover {
+  background: rgba(48, 86, 245, 0.08) !important;
+  border-color: var(--app-border-strong) !important;
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .sd-btn,
+[data-theme="light"] .primary-btn,
+[data-theme="light"] .apply-btn,
+[data-theme="light"] .register-btn,
+[data-theme="light"] .submit-btn,
+[data-theme="light"] .run-tests-btn,
+[data-theme="light"] .create-btn,
+[data-theme="light"] .neon-btn,
+[data-theme="light"] .chat-input button,
+[data-theme="light"] .profile-action-btn.primary,
+[data-theme="light"] .profile-action-btn.success,
+[data-theme="light"] .booking-box .sd-btn,
+[data-theme="light"] .mentor-card .sd-btn {
+  background: linear-gradient(135deg, var(--app-accent), var(--app-accent-2)) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: var(--shadow-primary) !important;
+}
+
+[data-theme="light"] .danger-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+[data-theme="light"] .success-btn {
+  background: linear-gradient(135deg, #3056f5, #2144da) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+[data-theme="light"] .sd-container,
+[data-theme="light"] .rec-content,
+[data-theme="light"] .org-content,
+[data-theme="light"] .profile-shell,
+[data-theme="light"] .roadmap-page,
+[data-theme="light"] .hackathon-page {
+  color: var(--app-text);
+}
+
+[data-theme="light"] .sd-container,
+[data-theme="light"] .rec-content,
+[data-theme="light"] .org-content {
+  max-width: 1440px !important;
+}
+
+[data-theme="light"] .page-intro h1,
+[data-theme="light"] .sd-header h1,
+[data-theme="light"] .page-title,
+[data-theme="light"] .roadmap-title,
+[data-theme="light"] .profile-topbar h1,
+[data-theme="light"] .hero-copy h2 {
+  background: linear-gradient(135deg, var(--app-accent), var(--app-accent-2)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+[data-theme="light"] .page-intro p,
+[data-theme="light"] .sd-header p,
+[data-theme="light"] .page-subtitle,
+[data-theme="light"] .roadmap-subtitle,
+[data-theme="light"] .profile-subtitle,
+[data-theme="light"] .hero-bio,
+[data-theme="light"] .completion-copy,
+[data-theme="light"] .contact-row,
+[data-theme="light"] .card-meta,
+[data-theme="light"] .skill-card-top span,
+[data-theme="light"] .project-card-modern p,
+[data-theme="light"] .jobs-hero p,
+[data-theme="light"] .filter-header p,
+[data-theme="light"] .summary-card p,
+[data-theme="light"] .job-description,
+[data-theme="light"] .sidebar-copy,
+[data-theme="light"] .priority-card p,
+[data-theme="light"] .mentor-card p,
+[data-theme="light"] .booking-helper-text,
+[data-theme="light"] .session-item small,
+[data-theme="light"] .description-text,
+[data-theme="light"] .section-copy {
+  color: var(--app-muted) !important;
+}
+
+[data-theme="light"] .table-head,
+[data-theme="light"] .table-row,
+[data-theme="light"] .table-row span,
+[data-theme="light"] .table-row div,
+[data-theme="light"] .candidate-meta-grid,
+[data-theme="light"] .read-only-profile,
+[data-theme="light"] .job-meta-compact span,
+[data-theme="light"] .contact-list,
+[data-theme="light"] .contact-row,
+[data-theme="light"] .hero-role,
+[data-theme="light"] .module-copy,
+[data-theme="light"] .project-copy,
+[data-theme="light"] .constraints-list li,
+[data-theme="light"] .example-value,
+[data-theme="light"] .execution-subtitle,
+[data-theme="light"] .metric-inline-row,
+[data-theme="light"] .session-item p,
+[data-theme="light"] .mentor-popup p,
+[data-theme="light"] .organizer,
+[data-theme="light"] .date,
+[data-theme="light"] .prize,
+[data-theme="light"] .hackathon-description,
+[data-theme="light"] .registration-form,
+[data-theme="light"] .job-description-detail p,
+[data-theme="light"] .job-detail-list {
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .table-row small,
+[data-theme="light"] .company-name,
+[data-theme="light"] .job-match-widget span,
+[data-theme="light"] .empty-inline-note,
+[data-theme="light"] .stat-label,
+[data-theme="light"] .analysis-label,
+[data-theme="light"] .io-label,
+[data-theme="light"] .example-key,
+[data-theme="light"] .field-help,
+[data-theme="light"] .field-block label,
+[data-theme="light"] .profile-form-card label,
+[data-theme="light"] .booking-note,
+[data-theme="light"] .registration-form input::placeholder,
+[data-theme="light"] .registration-form textarea::placeholder,
+[data-theme="light"] .create-form input::placeholder,
+[data-theme="light"] .job-form input::placeholder,
+[data-theme="light"] .job-form textarea::placeholder,
+[data-theme="light"] .org-form input::placeholder,
+[data-theme="light"] .org-form textarea::placeholder,
+[data-theme="light"] .profile-form-card input::placeholder,
+[data-theme="light"] .profile-form-card textarea::placeholder,
+[data-theme="light"] .roadmap-input::placeholder,
+[data-theme="light"] .chat-input input::placeholder,
+[data-theme="light"] .resume-textarea::placeholder,
+[data-theme="light"] .filter-input input::placeholder {
+  color: #6b789d !important;
+}
+
+[data-theme="light"] .job-title-row h3,
+[data-theme="light"] .sidebar-card h3,
+[data-theme="light"] .candidate-project-card h4,
+[data-theme="light"] .profile-form-card h2,
+[data-theme="light"] .card-head h3,
+[data-theme="light"] .project-card-modern h4,
+[data-theme="light"] .practice-resource-title,
+[data-theme="light"] .practice-resource-item h4,
+[data-theme="light"] .section-title,
+[data-theme="light"] .test-title,
+[data-theme="light"] .analysis-card-title,
+[data-theme="light"] .test-case-name,
+[data-theme="light"] .roadmap-overview h2,
+[data-theme="light"] .tree-node-title,
+[data-theme="light"] .section-title-lg,
+[data-theme="light"] .module-card h3,
+[data-theme="light"] .card-body h2,
+[data-theme="light"] .modal-header h2,
+[data-theme="light"] .mentor-popup-title,
+[data-theme="light"] .mentor-popup-name {
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .project-card-modern p,
+[data-theme="light"] .candidate-project-card p,
+[data-theme="light"] .event-rule-box p,
+[data-theme="light"] .practice-resource-description,
+[data-theme="light"] .analysis-card p,
+[data-theme="light"] .test-case-details,
+[data-theme="light"] .module-task-list,
+[data-theme="light"] .insight-list,
+[data-theme="light"] .hero-bio,
+[data-theme="light"] .profile-subtitle {
+  color: var(--app-muted) !important;
+}
+
+[data-theme="light"] .candidate-project-card a,
+[data-theme="light"] .read-only-profile a,
+[data-theme="light"] .priority-links a,
+[data-theme="light"] .practice-resource-link,
+[data-theme="light"] .project-card-v2 a {
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .sd-card,
+[data-theme="light"] .sd-glass,
+[data-theme="light"] .dashboard-callout,
+[data-theme="light"] .dashboard-warning-strip,
+[data-theme="light"] .dashboard-issue-card,
+[data-theme="light"] .dashboard-hero-card,
+[data-theme="light"] .dashboard-side-card,
+[data-theme="light"] .dashboard-panel,
+[data-theme="light"] .dashboard-stat-card,
+[data-theme="light"] .dashboard-profile-card,
+[data-theme="light"] .dashboard-skill-box,
+[data-theme="light"] .dashboard-platform-card,
+[data-theme="light"] .dashboard-repo-card,
+[data-theme="light"] .dashboard-bar-stack,
+[data-theme="light"] .dashboard-mini-metrics div,
+[data-theme="light"] .page-intro,
+[data-theme="light"] .stat-card,
+[data-theme="light"] .dashboard-action-card,
+[data-theme="light"] .job-form,
+[data-theme="light"] .org-form,
+[data-theme="light"] .table,
+[data-theme="light"] .applicant-card,
+[data-theme="light"] .profile-card,
+[data-theme="light"] .empty-state-panel,
+[data-theme="light"] .team-editor-card,
+[data-theme="light"] .profile-hero-card,
+[data-theme="light"] .portfolio-card,
+[data-theme="light"] .profile-side-card,
+[data-theme="light"] .skill-card-modern,
+[data-theme="light"] .project-card-modern,
+[data-theme="light"] .highlight-stat-card,
+[data-theme="light"] .link-card-modern,
+[data-theme="light"] .editor-card,
+[data-theme="light"] .profile-summary-card,
+[data-theme="light"] .profile-form-card,
+[data-theme="light"] .project-card-v2,
+[data-theme="light"] .jobs-hero,
+[data-theme="light"] .jobs-filter-panel,
+[data-theme="light"] .summary-card,
+[data-theme="light"] .job-card,
+[data-theme="light"] .sidebar-card,
+[data-theme="light"] .jobs-banner,
+[data-theme="light"] .chat-box,
+[data-theme="light"] .mentor-card,
+[data-theme="light"] .booking-box,
+[data-theme="light"] .session-box,
+[data-theme="light"] .glass-card,
+[data-theme="light"] .hackathon-card,
+[data-theme="light"] .info-box,
+[data-theme="light"] .create-form,
+[data-theme="light"] .registration-modal,
+[data-theme="light"] .registration-form,
+[data-theme="light"] .problem-list-drawer,
+[data-theme="light"] .leetcode-navbar,
+[data-theme="light"] .problem-card,
+[data-theme="light"] .module-tab,
+[data-theme="light"] .left-panel,
+[data-theme="light"] .right-panel,
+[data-theme="light"] .description-section,
+[data-theme="light"] .example-card,
+[data-theme="light"] .format-card,
+[data-theme="light"] .practice-resource-card,
+[data-theme="light"] .editor-section,
+[data-theme="light"] .test-results-panel,
+[data-theme="light"] .analysis-card,
+[data-theme="light"] .analysis-panel {
+  background: var(--app-card) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: var(--app-shadow) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .dashboard-action-card,
+[data-theme="light"] .applicant-card,
+[data-theme="light"] .job-card,
+[data-theme="light"] .hackathon-card,
+[data-theme="light"] .mentor-card,
+[data-theme="light"] .project-card-modern,
+[data-theme="light"] .link-card-modern,
+[data-theme="light"] .dashboard-platform-card,
+[data-theme="light"] .dashboard-repo-card,
+[data-theme="light"] .skill-card-modern,
+[data-theme="light"] .profile-summary-card,
+[data-theme="light"] .project-card-v2,
+[data-theme="light"] .problem-card,
+[data-theme="light"] .module-tab,
+[data-theme="light"] .stat-card,
+[data-theme="light"] .sd-card,
+[data-theme="light"] .glass-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+[data-theme="light"] .dashboard-action-card:hover,
+[data-theme="light"] .applicant-card:hover,
+[data-theme="light"] .job-card:hover,
+[data-theme="light"] .hackathon-card:hover,
+[data-theme="light"] .mentor-card:hover,
+[data-theme="light"] .project-card-modern:hover,
+[data-theme="light"] .link-card-modern:hover,
+[data-theme="light"] .dashboard-platform-card:hover,
+[data-theme="light"] .dashboard-repo-card:hover,
+[data-theme="light"] .skill-card-modern:hover,
+[data-theme="light"] .profile-summary-card:hover,
+[data-theme="light"] .project-card-v2:hover,
+[data-theme="light"] .problem-card:hover,
+[data-theme="light"] .module-tab:hover,
+[data-theme="light"] .stat-card:hover,
+[data-theme="light"] .sd-card:hover,
+[data-theme="light"] .glass-card:hover {
+  transform: translateY(-6px) !important;
+  border-color: var(--app-border-strong) !important;
+  box-shadow: 0 28px 60px rgba(73, 90, 179, 0.14) !important;
+}
+
+[data-theme="light"] .stat-card b,
+[data-theme="light"] .dashboard-stat-card strong,
+[data-theme="light"] .sd-card p,
+[data-theme="light"] .summary-card strong,
+[data-theme="light"] .completion-value,
+[data-theme="light"] .highlight-stat-card strong,
+[data-theme="light"] .stat-value,
+[data-theme="light"] .metric-pill,
+[data-theme="light"] .project-chip,
+[data-theme="light"] .job-match-widget strong,
+[data-theme="light"] .priority-links a,
+[data-theme="light"] .practice-resource-link,
+[data-theme="light"] .dashboard-chip,
+[data-theme="light"] .tree-badge,
+[data-theme="light"] .job-source-chip,
+[data-theme="light"] .profile-status-chip,
+[data-theme="light"] .mini-heading,
+[data-theme="light"] .profile-eyebrow,
+[data-theme="light"] .card-eyebrow,
+[data-theme="light"] .page-intro h1 + p strong {
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .dashboard-stat-card,
+[data-theme="light"] .dashboard-profile-card,
+[data-theme="light"] .dashboard-platform-card,
+[data-theme="light"] .dashboard-repo-card,
+[data-theme="light"] .dashboard-skill-box,
+[data-theme="light"] .highlight-stat-card,
+[data-theme="light"] .link-card-modern,
+[data-theme="light"] .candidate-project-card,
+[data-theme="light"] .platform-sync-card,
+[data-theme="light"] .candidate-project-card,
+[data-theme="light"] .priority-card,
+[data-theme="light"] .practice-resource-item,
+[data-theme="light"] .analysis-stat,
+[data-theme="light"] .test-case-item,
+[data-theme="light"] .stats-grid .stat-item,
+[data-theme="light"] .example-content,
+[data-theme="light"] .event-rule-box {
+  background: rgba(244, 247, 255, 0.88) !important;
+  border: 1px solid rgba(88, 101, 242, 0.12) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .dashboard-stat-card.accent-blue,
+[data-theme="light"] .dashboard-stat-card.accent-orange,
+[data-theme="light"] .dashboard-stat-card.accent-slate,
+[data-theme="light"] .summary-card,
+[data-theme="light"] .profile-summary-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 255, 0.9)) !important;
+}
+
+[data-theme="light"] .job-form input,
+[data-theme="light"] .job-form textarea,
+[data-theme="light"] .job-form select,
+[data-theme="light"] .org-form input,
+[data-theme="light"] .org-form textarea,
+[data-theme="light"] .org-form select,
+[data-theme="light"] .profile-form-card input,
+[data-theme="light"] .profile-form-card textarea,
+[data-theme="light"] .profile-form-card select,
+[data-theme="light"] .field-block input,
+[data-theme="light"] .field-block textarea,
+[data-theme="light"] .editor-card input,
+[data-theme="light"] .editor-card textarea,
+[data-theme="light"] .booking-box input,
+[data-theme="light"] .booking-box select,
+[data-theme="light"] .booking-box textarea,
+[data-theme="light"] .create-form input,
+[data-theme="light"] .create-form textarea,
+[data-theme="light"] .create-form select,
+[data-theme="light"] .registration-form input,
+[data-theme="light"] .registration-form textarea,
+[data-theme="light"] .registration-form select,
+[data-theme="light"] .chat-input input,
+[data-theme="light"] .roadmap-input,
+[data-theme="light"] .filter-input,
+[data-theme="light"] .filter-field select,
+[data-theme="light"] .filter-field input,
+[data-theme="light"] .resume-textarea,
+[data-theme="light"] .auth-card input {
+  background: #ffffff !important;
+  border: 1px solid var(--app-border) !important;
+  color: var(--app-text) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="light"] .job-form input:focus,
+[data-theme="light"] .job-form textarea:focus,
+[data-theme="light"] .job-form select:focus,
+[data-theme="light"] .org-form input:focus,
+[data-theme="light"] .org-form textarea:focus,
+[data-theme="light"] .org-form select:focus,
+[data-theme="light"] .profile-form-card input:focus,
+[data-theme="light"] .profile-form-card textarea:focus,
+[data-theme="light"] .profile-form-card select:focus,
+[data-theme="light"] .field-block input:focus,
+[data-theme="light"] .field-block textarea:focus,
+[data-theme="light"] .editor-card input:focus,
+[data-theme="light"] .editor-card textarea:focus,
+[data-theme="light"] .booking-box input:focus,
+[data-theme="light"] .booking-box select:focus,
+[data-theme="light"] .booking-box textarea:focus,
+[data-theme="light"] .create-form input:focus,
+[data-theme="light"] .create-form textarea:focus,
+[data-theme="light"] .create-form select:focus,
+[data-theme="light"] .registration-form input:focus,
+[data-theme="light"] .registration-form textarea:focus,
+[data-theme="light"] .registration-form select:focus,
+[data-theme="light"] .chat-input input:focus,
+[data-theme="light"] .roadmap-input:focus,
+[data-theme="light"] .filter-field select:focus,
+[data-theme="light"] .resume-textarea:focus,
+[data-theme="light"] .auth-card input:focus {
+  outline: none !important;
+  border-color: var(--app-border-strong) !important;
+  box-shadow: 0 0 0 4px rgba(48, 86, 245, 0.1) !important;
+}
+
+[data-theme="light"] .jobs-page,
+[data-theme="light"] .mentor-page,
+[data-theme="light"] .roadmap-page,
+[data-theme="light"] .hackathon-page,
+[data-theme="light"] .profile-shell,
+[data-theme="light"] .leetcode-container {
+  background: transparent !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .eyebrow,
+[data-theme="light"] .summary-label,
+[data-theme="light"] .tree-badge,
+[data-theme="light"] .quick-tag,
+[data-theme="light"] .problem-card-category,
+[data-theme="light"] .practice-resource-kicker,
+[data-theme="light"] .job-source-chip,
+[data-theme="light"] .dashboard-eyebrow,
+[data-theme="light"] .floating-label,
+[data-theme="light"] .profile-eyebrow,
+[data-theme="light"] .card-eyebrow,
+[data-theme="light"] .mini-heading,
+[data-theme="light"] .profile-status-chip {
+  background: rgba(48, 86, 245, 0.08) !important;
+  border: 1px solid rgba(48, 86, 245, 0.12) !important;
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .job-card--great,
+[data-theme="light"] .job-card--good,
+[data-theme="light"] .job-card--gap {
+  border-left: 4px solid var(--app-accent) !important;
+}
+
+[data-theme="light"] .match-bar,
+[data-theme="light"] .skill-progress-fill,
+[data-theme="light"] .dashboard-bar,
+[data-theme="light"] .progress-track span {
+  background: linear-gradient(90deg, var(--app-accent), var(--app-accent-2)) !important;
+}
+
+[data-theme="light"] .sidebar-card--compliance,
+[data-theme="light"] .roadmap-error,
+[data-theme="light"] .warning-box {
+  background: rgba(255, 248, 239, 0.9) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+[data-theme="light"] .tips-box,
+[data-theme="light"] .info-box,
+[data-theme="light"] .dashboard-callout {
+  background: rgba(240, 245, 255, 0.95) !important;
+}
+
+[data-theme="light"] .mentor-tabs button,
+[data-theme="light"] .switch-tab-btn,
+[data-theme="light"] .module-tab,
+[data-theme="light"] .lang-menu,
+[data-theme="light"] .lang-menu-item,
+[data-theme="light"] .job-modal-panel,
+[data-theme="light"] .job-modal,
+[data-theme="light"] .registration-modal,
+[data-theme="light"] .team-editor-card button,
+[data-theme="light"] .file-input-label {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border: 1px solid var(--app-border) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .mentor-tabs button:hover,
+[data-theme="light"] .switch-tab-btn:hover,
+[data-theme="light"] .lang-menu-item:hover,
+[data-theme="light"] .team-editor-card button:hover,
+[data-theme="light"] .file-input-label:hover {
+  background: rgba(48, 86, 245, 0.08) !important;
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .mentor-tabs .active,
+[data-theme="light"] .switch-tab-btn,
+[data-theme="light"] .module-tab.active,
+[data-theme="light"] .lang-menu-item.active {
+  background: linear-gradient(135deg, rgba(48, 86, 245, 0.12), rgba(91, 49, 232, 0.12)) !important;
+  color: var(--app-accent) !important;
+  border-color: rgba(88, 101, 242, 0.18) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="light"] .chat-messages,
+[data-theme="light"] .code-preview,
+[data-theme="light"] .code-editor,
+[data-theme="light"] .io-code,
+[data-theme="light"] .inline-code,
+[data-theme="light"] .rich-text pre {
+  background: #18254d !important;
+  color: #dbe6ff !important;
+  border-color: rgba(109, 168, 255, 0.24) !important;
+}
+
+[data-theme="light"] .msg.ai p,
+[data-theme="light"] .msg.user p,
+[data-theme="light"] .msg.ai .msg-content {
+  border: 1px solid rgba(88, 101, 242, 0.14) !important;
+  box-shadow: 0 16px 30px rgba(73, 90, 179, 0.08) !important;
+}
+
+[data-theme="light"] .msg.ai p,
+[data-theme="light"] .msg.ai .msg-content {
+  background: rgba(240, 245, 255, 0.94) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .msg.user p {
+  background: linear-gradient(135deg, var(--app-accent), var(--app-accent-2)) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .roadmap-page {
+  padding-top: 12px !important;
+}
+
+[data-theme="light"] .roadmap-title,
+[data-theme="light"] .page-title {
+  letter-spacing: -0.04em !important;
+}
+
+[data-theme="light"] .roadmap-duration,
+[data-theme="light"] .skill-pill,
+[data-theme="light"] .project-difficulty,
+[data-theme="light"] .status-pill,
+[data-theme="light"] .application-state,
+[data-theme="light"] .accepted-tag {
+  background: rgba(48, 86, 245, 0.08) !important;
+  border: 1px solid rgba(48, 86, 245, 0.12) !important;
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .profile-action-btn.ghost,
+[data-theme="light"] .quick-tag,
+[data-theme="light"] .project-tag,
+[data-theme="light"] .skill-pill,
+[data-theme="light"] .tag-row span,
+[data-theme="light"] .skill-pill,
+[data-theme="light"] .skills span,
+[data-theme="light"] .tags span,
+[data-theme="light"] .skill-pill,
+[data-theme="light"] .matched-pill,
+[data-theme="light"] .required-pill,
+[data-theme="light"] .profile-pill,
+[data-theme="light"] .missing-pill,
+[data-theme="light"] .skill-pill {
+  background: rgba(48, 86, 245, 0.06) !important;
+  border: 1px solid rgba(88, 101, 242, 0.12) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="light"] .hackathon-header,
+[data-theme="light"] .profile-topbar,
+[data-theme="light"] .sd-header {
+  border-bottom-color: rgba(88, 101, 242, 0.12) !important;
+}
+
+[data-theme="light"] .jobs-hero,
+[data-theme="light"] .profile-hero-card,
+[data-theme="light"] .dashboard-hero-card,
+[data-theme="light"] .cta-panel,
+[data-theme="light"] .auth-showcase {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="light"] .jobs-hero::before,
+[data-theme="light"] .profile-hero-card::before,
+[data-theme="light"] .dashboard-hero-card::before,
+[data-theme="light"] .auth-showcase::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(168, 85, 247, 0.08), transparent 30%);
+  pointer-events: none;
+}
+
+[data-theme="light"] .rec-overlay,
+[data-theme="light"] .org-overlay,
+[data-theme="light"] .sd-overlay,
+[data-theme="light"] .problem-list-overlay,
+[data-theme="light"] .modal-overlay,
+[data-theme="light"] .job-modal-overlay,
+[data-theme="light"] .mentor-ai-fullscreen {
+  background: rgba(19, 32, 61, 0.24) !important;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 768px) {
+  [data-theme="light"] .sd-navbar,
+[data-theme="light"] .rec-header,
+[data-theme="light"] .org-header {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  [data-theme="light"] .sd-container,
+[data-theme="light"] .rec-content,
+[data-theme="light"] .org-content,
+[data-theme="light"] .profile-shell,
+[data-theme="light"] .hackathon-page {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}

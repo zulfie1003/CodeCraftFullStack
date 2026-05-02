@@ -2,11 +2,13 @@ import { useState } from "react";
 import StudentSidebar from "../components/StudentSidebar";
 import StudentNavbar from "../components/StudentNavbar";
 import { ThemeProvider } from "../context/ThemeContext";
+import useScrollReveal from "../hooks/useScrollReveal";
 import "../styles/studentDashboard.css";
 import "../styles/theme.css";
 
 function StudentLayout({ children }) {
   const [open, setOpen] = useState(false);
+  useScrollReveal();
 
   return (
     <ThemeProvider>

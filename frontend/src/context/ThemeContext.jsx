@@ -1,11 +1,12 @@
-import { createContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useEffect, useState } from 'react';
 
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('theme-mode');
-    return saved ? saved === 'dark' : true; // Default to dark mode
+    return saved ? saved === 'dark' : false;
   });
 
   useEffect(() => {
@@ -15,7 +16,7 @@ export const ThemeProvider = ({ children }) => {
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
+    setIsDarkMode((current) => !current);
   };
 
   return (
