@@ -48,11 +48,11 @@ function PracticeProblemDetails({ problem, resource }) {
           <h2 className="section-title">Execution Format</h2>
           <div className="format-card">
             <p className="description-text">
-              The editor now uses a GFG-style <code className="inline-code">solve(input)</code>{" "}
-              template. Judge0 runs your code against the sample inputs shown above.
+              The editor starts with only the function name, parameters, and return type for the
+              selected problem.
             </p>
             <ul className="constraints-list">
-              <li>Edit only the logic inside the template.</li>
+              <li>Replace the signature notes with your implementation before running.</li>
               <li>Use the sample input format exactly as shown in the problem examples.</li>
               <li>Return or print the final output in the same format as the sample output.</li>
               <li>Submit becomes available only after all Judge0 sample tests pass.</li>

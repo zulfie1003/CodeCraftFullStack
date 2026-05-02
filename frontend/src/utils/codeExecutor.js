@@ -206,7 +206,7 @@ export const validateCode = (code, language) => {
 /**
  * Problem signature mapping - maps problem IDs to their function signatures and details
  */
-const PROBLEM_SIGNATURES = {
+export const PROBLEM_SIGNATURES = {
   // ARRAY PROBLEMS
   arr1: { fn: "twoSum", params: ["nums: number[]", "target: number"], ret: "number[]", desc: "Return indices of two numbers that sum to target" },
   arr2: { fn: "maxProfit", params: ["prices: number[]"], ret: "number", desc: "Find max profit from buying and selling stock once" },

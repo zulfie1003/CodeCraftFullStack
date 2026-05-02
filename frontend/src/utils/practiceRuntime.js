@@ -1,3 +1,5 @@
+import { PROBLEM_SIGNATURES } from "./codeExecutor";
+
 export const LANGUAGES = {
   javascript: { id: "javascript", name: "JavaScript", icon: "🟨", judge0Id: 63 },
   python: { id: "python", name: "Python", icon: "🐍", judge0Id: 71 },
@@ -5,168 +7,130 @@ export const LANGUAGES = {
   cpp: { id: "cpp", name: "C++", icon: "⚙️", judge0Id: 54 },
 };
 
-const getSampleInput = (problem) => problem?.examples?.[0]?.input || "";
-const getSampleOutput = (problem) => problem?.examples?.[0]?.output || "";
-
-const getHeaderComment = (problem) => {
-  const title = problem?.title || "Practice Problem";
-  const input = getSampleInput(problem);
-  const output = getSampleOutput(problem);
+const toReadableTitleSignature = (problem) => {
+  const fallbackName = String(problem?.title || "solution")
+    .replace(/[^a-zA-Z0-9]+(.)/g, (_, char) => char.toUpperCase())
+    .replace(/^[A-Z]/, (char) => char.toLowerCase())
+    .replace(/[^a-zA-Z0-9]/g, "");
 
   return {
-    title,
-    input,
-    output,
+    fn: fallbackName || "solution",
+    params: ["input: string"],
+    ret: "string",
   };
 };
 
-const createJavaScriptTemplate = (problem) => {
-  const { title, input, output } = getHeaderComment(problem);
+const getProblemSignature = (problem) =>
+  PROBLEM_SIGNATURES[problem?.id] || toReadableTitleSignature(problem);
 
-  return `/**
- * ${title}
- * Sample input: ${input}
- * Sample output: ${output}
- *
- * Write your logic inside solve(input).
- * Return the final answer exactly as it should be printed.
- */
-function solve(input) {
-  return "";
-}
+const splitParam = (param) => {
+  const [name, type = "any"] = param.split(": ");
+  return { name, type };
+};
 
-const fs = require("fs");
-const input = fs.readFileSync(0, "utf8").trim();
-const result = solve(input);
+const pythonName = (name) =>
+  name.replace(/([A-Z])/g, "_$1").toLowerCase().replace(/^_/, "");
 
-if (typeof result !== "undefined" && result !== null) {
-  if (typeof result === "string") {
-    console.log(result);
-  } else {
-    console.log(JSON.stringify(result));
+const pythonType = (type) =>
+  type
+    .replace(/number\[\]\[\]/g, "List[List[int]]")
+    .replace(/string\[\]\[\]/g, "List[List[str]]")
+    .replace(/number\[\]/g, "List[int]")
+    .replace(/string\[\]/g, "List[str]")
+    .replace(/boolean/g, "bool")
+    .replace(/number/g, "int")
+    .replace(/string/g, "str")
+    .replace(/void/g, "None");
+
+const javaType = (type) =>
+  type
+    .replace(/number\[\]\[\]/g, "int[][]")
+    .replace(/string\[\]\[\]/g, "String[][]")
+    .replace(/number\[\]/g, "int[]")
+    .replace(/string\[\]/g, "String[]")
+    .replace(/number/g, "int")
+    .replace(/string/g, "String")
+    .replace(/boolean/g, "boolean");
+
+const cppType = (type, isParam = false) => {
+  const mapped = type
+    .replace(/number\[\]\[\]/g, "vector<vector<int>>")
+    .replace(/string\[\]\[\]/g, "vector<vector<string>>")
+    .replace(/number\[\]/g, "vector<int>")
+    .replace(/string\[\]/g, "vector<string>")
+    .replace(/number/g, "int")
+    .replace(/string/g, "string")
+    .replace(/boolean/g, "bool");
+
+  if (isParam && (mapped.startsWith("vector") || mapped === "string")) {
+    return `${mapped}&`;
   }
-}
-`;
+
+  return mapped;
 };
 
-const createPythonTemplate = (problem) => {
-  const { title, input, output } = getHeaderComment(problem);
-
-  return `"""
-${title}
-Sample input: ${input}
-Sample output: ${output}
-
-Write your logic inside solve(input_data).
-Return the final answer exactly as it should be printed.
-"""
-
-def solve(input_data):
-    return ""
-
-
-if __name__ == "__main__":
-    import json
-    import sys
-
-    input_data = sys.stdin.read().strip()
-    result = solve(input_data)
-
-    if result is not None:
-        if isinstance(result, (dict, list, tuple, bool, int, float)):
-            print(json.dumps(result))
-        else:
-            print(result)
-`;
+const defaultReturnForJava = (type) => {
+  if (type === "void") return "";
+  if (type === "boolean") return "\n        return false;";
+  if (type === "number") return "\n        return 0;";
+  return "\n        return null;";
 };
 
-const createJavaTemplate = (problem) => {
-  const { title, input, output } = getHeaderComment(problem);
+const defaultReturnForCpp = (type) => {
+  if (type === "void") return "";
+  if (type === "boolean") return "\n        return false;";
+  if (type === "number") return "\n        return 0;";
+  return "\n        return {};";
+};
 
-  return `import java.io.BufferedReader;
-import java.io.InputStreamReader;
+const createLeetCodeTemplate = (language, problem) => {
+  const signature = getProblemSignature(problem);
+  const params = signature.params.map(splitParam);
 
-public class Main {
-    /*
-     * ${title}
-     * Sample input: ${input}
-     * Sample output: ${output}
-     *
-     * Write your logic inside solve(input).
-     * Return the final answer exactly as it should be printed.
-     */
-    static String solve(String input) {
-        return "";
+  if (language === "python") {
+    const typedParams = params
+      .map(({ name, type }) => `${name}: ${pythonType(type)}`)
+      .join(", ");
+    const returnType = pythonType(signature.ret);
+
+    return `class Solution:
+    def ${pythonName(signature.fn)}(self${typedParams ? `, ${typedParams}` : ""}) -> ${returnType}:
+        `;
+  }
+
+  if (language === "java") {
+    const typedParams = params
+      .map(({ name, type }) => `${javaType(type)} ${name}`)
+      .join(", ");
+    const returnType = javaType(signature.ret);
+
+    return `class Solution {
+    public ${returnType} ${signature.fn}(${typedParams}) {${defaultReturnForJava(signature.ret)}
     }
+}`;
+  }
 
-    public static void main(String[] args) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder input = new StringBuilder();
-        String line;
-        boolean firstLine = true;
+  if (language === "cpp") {
+    const typedParams = params
+      .map(({ name, type }) => `${cppType(type, true)} ${name}`)
+      .join(", ");
+    const returnType = cppType(signature.ret);
 
-        while ((line = reader.readLine()) != null) {
-            if (!firstLine) {
-                input.append("\\n");
-            }
-            input.append(line);
-            firstLine = false;
-        }
-
-        String result = solve(input.toString().trim());
-        if (result != null) {
-            System.out.print(result);
-        }
+    return `class Solution {
+public:
+    ${returnType} ${signature.fn}(${typedParams}) {${defaultReturnForCpp(signature.ret)}
     }
-}
-`;
-};
+};`;
+  }
 
-const createCppTemplate = (problem) => {
-  const { title, input, output } = getHeaderComment(problem);
-
-  return `#include <bits/stdc++.h>
-using namespace std;
-
-/*
- * ${title}
- * Sample input: ${input}
- * Sample output: ${output}
- *
- * Write your logic inside solve(input).
- * Return the final answer exactly as it should be printed.
- */
-string solve(const string& input) {
-    return "";
-}
-
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    string input((istreambuf_iterator<char>(cin)), istreambuf_iterator<char>());
-    string result = solve(input);
-
-    cout << result;
-
-    return 0;
-}
-`;
+  const jsParams = params.map(({ name }) => name).join(", ");
+  return `var ${signature.fn} = function(${jsParams}) {
+    
+};`;
 };
 
 export const getCodeTemplate = (language, problem) => {
-  switch (language) {
-    case "javascript":
-      return createJavaScriptTemplate(problem);
-    case "python":
-      return createPythonTemplate(problem);
-    case "java":
-      return createJavaTemplate(problem);
-    case "cpp":
-      return createCppTemplate(problem);
-    default:
-      return createJavaScriptTemplate(problem);
-  }
+  return createLeetCodeTemplate(language, problem);
 };
 
 export const validateCode = (code, language) => {
@@ -174,19 +138,6 @@ export const validateCode = (code, language) => {
 
   if (!trimmedCode) {
     return ["Code cannot be empty."];
-  }
-
-  const requiredMarkers = {
-    javascript: "function solve",
-    python: "def solve",
-    java: "class Main",
-    cpp: "string solve",
-  };
-
-  const marker = requiredMarkers[language];
-
-  if (marker && !trimmedCode.includes(marker)) {
-    return [`${LANGUAGES[language]?.name || "Selected language"} code must include "${marker}".`];
   }
 
   return [];

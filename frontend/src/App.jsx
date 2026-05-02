@@ -26,6 +26,7 @@ import CreateHackathon from "./pages/organizer/CreateHackathon.jsx";
 import OrganizerHackathons from "./pages/organizer/Hackathons.jsx";
 import Participants from "./pages/organizer/Participants.jsx";
 import OrganizerProfile from "./pages/organizer/OrganizerProfile.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { getHomePathForRole, getStoredUser } from "./utils/auth";
 import "./styles/light-mode-overrides.css";
 import "./styles/interaction-system.css";
@@ -42,48 +43,50 @@ function FallbackRedirect() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* PUBLIC */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* PUBLIC */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* ================= STUDENT ================= */}
-        <Route element={<ProtectedRoute role="student" />}>
-          <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
-          <Route path="/student/dashboard" element={<Dashboard />} />
-          <Route path="/student/practice" element={<Practice />} />
-          <Route path="/student/jobs" element={<Jobs />} />
-          <Route path="/student/profile" element={<Profile />} />
-          <Route path="/student/hackathons" element={<Hackathons />} />
-          <Route path="/student/roadmap" element={<Roadmap />} />
-          <Route path="/student/mentor" element={<Mentor />} />
-        </Route>
+          {/* ================= STUDENT ================= */}
+          <Route element={<ProtectedRoute role="student" />}>
+            <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
+            <Route path="/student/dashboard" element={<Dashboard />} />
+            <Route path="/student/practice" element={<Practice />} />
+            <Route path="/student/jobs" element={<Jobs />} />
+            <Route path="/student/profile" element={<Profile />} />
+            <Route path="/student/hackathons" element={<Hackathons />} />
+            <Route path="/student/roadmap" element={<Roadmap />} />
+            <Route path="/student/mentor" element={<Mentor />} />
+          </Route>
 
-        {/* ================= RECRUITER ================= */}
-        <Route element={<ProtectedRoute role="recruiter" />}>
-          <Route path="/recruiter" element={<Navigate to="/recruiter/dashboard" replace />} />
-          <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
-          <Route path="/recruiter/jobs" element={<MyJobs />} />
-          <Route path="/recruiter/post-job" element={<PostJob />} />
-          <Route path="/recruiter/applicants" element={<Applicants />} />
-          <Route path="/recruiter/company" element={<CompanyProfile />} />
-        </Route>
+          {/* ================= RECRUITER ================= */}
+          <Route element={<ProtectedRoute role="recruiter" />}>
+            <Route path="/recruiter" element={<Navigate to="/recruiter/dashboard" replace />} />
+            <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
+            <Route path="/recruiter/jobs" element={<MyJobs />} />
+            <Route path="/recruiter/post-job" element={<PostJob />} />
+            <Route path="/recruiter/applicants" element={<Applicants />} />
+            <Route path="/recruiter/company" element={<CompanyProfile />} />
+          </Route>
 
-        {/* ================= ORGANIZER ================= */}
-        <Route element={<ProtectedRoute role="organizer" />}>
-          <Route path="/organizer" element={<Navigate to="/organizer/dashboard" replace />} />
-          <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
-          <Route path="/organizer/create" element={<CreateHackathon />} />
-          <Route path="/organizer/hackathons" element={<OrganizerHackathons />} />
-          <Route path="/organizer/participants" element={<Participants />} />
-          <Route path="/organizer/profile" element={<OrganizerProfile />} />
-        </Route>
+          {/* ================= ORGANIZER ================= */}
+          <Route element={<ProtectedRoute role="organizer" />}>
+            <Route path="/organizer" element={<Navigate to="/organizer/dashboard" replace />} />
+            <Route path="/organizer/dashboard" element={<OrganizerDashboard />} />
+            <Route path="/organizer/create" element={<CreateHackathon />} />
+            <Route path="/organizer/hackathons" element={<OrganizerHackathons />} />
+            <Route path="/organizer/participants" element={<Participants />} />
+            <Route path="/organizer/profile" element={<OrganizerProfile />} />
+          </Route>
 
-        <Route path="*" element={<FallbackRedirect />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<FallbackRedirect />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

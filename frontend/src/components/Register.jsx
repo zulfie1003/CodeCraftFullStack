@@ -4,6 +4,7 @@ import api from "../api/axios";
 import AuthShowcase from "./AuthShowcase";
 import AuthRoleSelector from "./AuthRoleSelector";
 import GoogleAuthButton from "./GoogleAuthButton";
+import PublicThemeToggle from "./PublicThemeToggle";
 import useScrollReveal from "../hooks/useScrollReveal";
 
 import "../styles/auth.css";
@@ -115,6 +116,7 @@ function Register() {
 
   return (
     <div className="auth-page">
+      <PublicThemeToggle className="auth-theme-toggle" />
       <div className="auth-layout">
         <AuthShowcase
           badge={REGISTER_SHOWCASE.badge}

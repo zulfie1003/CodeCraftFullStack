@@ -4,6 +4,7 @@ import api from "../api/axios";
 import AuthShowcase from "./AuthShowcase";
 import AuthRoleSelector from "./AuthRoleSelector";
 import GoogleAuthButton from "./GoogleAuthButton";
+import PublicThemeToggle from "./PublicThemeToggle";
 import useScrollReveal from "../hooks/useScrollReveal";
 import { getHomePathForRole, storeAuthSession } from "../utils/auth";
 
@@ -226,6 +227,7 @@ function Login() {
 
   return (
     <div className="auth-page">
+      <PublicThemeToggle className="auth-theme-toggle" />
       <div className="auth-layout">
         <AuthShowcase
           badge={showcaseContent.badge}

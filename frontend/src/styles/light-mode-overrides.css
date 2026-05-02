@@ -881,6 +881,33 @@ html[data-theme="light"],
   color: var(--app-text) !important;
 }
 
+[data-theme="light"] .job-card-top {
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%) !important;
+  border: 1px solid rgba(191, 219, 254, 0.42) !important;
+  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.22) !important;
+  color: #000000 !important;
+}
+
+[data-theme="light"] .job-card-top .job-title-trigger,
+[data-theme="light"] .job-card-top .job-title-row h3 {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .job-card-top .company-name,
+[data-theme="light"] .job-card-top .job-source-chip,
+[data-theme="light"] .job-card-top .job-match-widget,
+[data-theme="light"] .job-card-top .job-match-widget strong,
+[data-theme="light"] .job-card-top .job-match-widget span {
+  color: #000000 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+[data-theme="light"] .job-card-top .job-source-chip,
+[data-theme="light"] .job-card-top .job-match-widget {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border: 1px solid rgba(255, 255, 255, 0.48) !important;
+}
+
 [data-theme="light"] .hackathon-header,
 [data-theme="light"] .profile-topbar,
 [data-theme="light"] .sd-header {
@@ -905,6 +932,118 @@ html[data-theme="light"],
   inset: 0;
   background: radial-gradient(circle at top right, rgba(168, 85, 247, 0.08), transparent 30%);
   pointer-events: none;
+}
+
+[data-theme="light"] .student-dashboard,
+[data-theme="light"] .student-dashboard * {
+  color: var(--app-text);
+}
+
+[data-theme="light"] .dashboard-header h1,
+[data-theme="light"] .dashboard-panel h2,
+[data-theme="light"] .dashboard-panel h3,
+[data-theme="light"] .dashboard-hero-card h2,
+[data-theme="light"] .dashboard-side-card h3,
+[data-theme="light"] .dashboard-profile-head h3,
+[data-theme="light"] .dashboard-platform-head strong,
+[data-theme="light"] .dashboard-repo-copy h3,
+[data-theme="light"] .dashboard-stat-card strong,
+[data-theme="light"] .dashboard-mini-metrics strong,
+[data-theme="light"] .dashboard-platform-value,
+[data-theme="light"] .dashboard-bar-total,
+[data-theme="light"] .dashboard-skill-row span,
+[data-theme="light"] .dashboard-practice-item strong {
+  color: var(--app-text) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+[data-theme="light"] .dashboard-kicker,
+[data-theme="light"] .dashboard-eyebrow,
+[data-theme="light"] .dashboard-inline-link,
+[data-theme="light"] .dashboard-chip,
+[data-theme="light"] .dashboard-stat-card strong,
+[data-theme="light"] .dashboard-platform-value,
+[data-theme="light"] .dashboard-skill-row strong,
+[data-theme="light"] .dashboard-practice-item span {
+  color: var(--app-accent) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+[data-theme="light"] .dashboard-header p,
+[data-theme="light"] .dashboard-callout p,
+[data-theme="light"] .dashboard-warning-strip p,
+[data-theme="light"] .dashboard-issue-card p,
+[data-theme="light"] .dashboard-platform-head p,
+[data-theme="light"] .dashboard-repo-copy p,
+[data-theme="light"] .dashboard-profile-card p,
+[data-theme="light"] .dashboard-stat-card p,
+[data-theme="light"] .dashboard-empty-copy,
+[data-theme="light"] .dashboard-profile-head span,
+[data-theme="light"] .dashboard-mini-metrics span,
+[data-theme="light"] .dashboard-platform-footer small,
+[data-theme="light"] .dashboard-repo-copy span,
+[data-theme="light"] .dashboard-bar-label,
+[data-theme="light"] .dashboard-legend,
+[data-theme="light"] .dashboard-panel-meta,
+[data-theme="light"] .dashboard-stat-label {
+  color: var(--text-muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+[data-theme="light"] .dashboard-callout,
+[data-theme="light"] .dashboard-warning-strip,
+[data-theme="light"] .dashboard-issue-card,
+[data-theme="light"] .dashboard-hero-card,
+[data-theme="light"] .dashboard-side-card,
+[data-theme="light"] .dashboard-panel {
+  background:
+    radial-gradient(circle at top right, rgba(48, 86, 245, 0.07), transparent 32%),
+    var(--app-card) !important;
+  border-color: var(--app-border) !important;
+  box-shadow: var(--app-shadow) !important;
+}
+
+[data-theme="light"] .dashboard-stat-card,
+[data-theme="light"] .dashboard-profile-card,
+[data-theme="light"] .dashboard-skill-box,
+[data-theme="light"] .dashboard-platform-card,
+[data-theme="light"] .dashboard-repo-card,
+[data-theme="light"] .dashboard-bar-stack,
+[data-theme="light"] .dashboard-mini-metrics div {
+  background: rgba(244, 247, 255, 0.88) !important;
+  border-color: rgba(88, 101, 242, 0.12) !important;
+}
+
+[data-theme="light"] .dashboard-panel-meta,
+[data-theme="light"] .dashboard-sync-pill,
+[data-theme="light"] .dashboard-sync-pill.is-loading {
+  background: rgba(48, 86, 245, 0.08) !important;
+  border-color: rgba(48, 86, 245, 0.14) !important;
+  color: var(--app-accent) !important;
+}
+
+[data-theme="light"] .dashboard-refresh-btn,
+[data-theme="light"] .dashboard-secondary-btn {
+  background: linear-gradient(135deg, var(--app-accent), var(--app-accent-2)) !important;
+  border-color: rgba(88, 101, 242, 0.18) !important;
+  color: #ffffff !important;
+  box-shadow: var(--shadow-primary) !important;
+}
+
+[data-theme="light"] .dashboard-refresh-btn *,
+[data-theme="light"] .dashboard-secondary-btn * {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .dashboard-secondary-btn.ghost {
+  background: rgba(48, 86, 245, 0.06) !important;
+  border-color: rgba(88, 101, 242, 0.14) !important;
+  color: var(--app-text) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="light"] .dashboard-secondary-btn.ghost * {
+  color: var(--app-text) !important;
 }
 
 [data-theme="light"] .rec-overlay,

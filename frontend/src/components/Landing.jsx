@@ -14,6 +14,8 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
+import PublicThemeToggle from "./PublicThemeToggle";
+import useScrollReveal from "../hooks/useScrollReveal";
 
 import "../styles/landing.css";
 
@@ -100,6 +102,7 @@ const SKILLS = [
 
 function Landing() {
   const navigate = useNavigate();
+  useScrollReveal();
 
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -125,6 +128,7 @@ function Landing() {
         </nav>
 
         <div className="landing-header-actions">
+          <PublicThemeToggle />
           <button type="button" className="btn-ghost" onClick={() => navigate("/login")}>
             Login
           </button>
