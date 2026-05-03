@@ -3,6 +3,7 @@ import {
   normalizeExperienceText,
   normalizeJobDescription,
 } from '../../utils/jobMatching.js';
+import { extractApplyUrl, isCareerPortalLink } from '../../utils/jobLinks.js';
 
 const parseRemote = (job = {}) =>
   /remote|work from home|hybrid/i.test(
@@ -36,24 +37,34 @@ const parseAdzunaPostedAt = (job = {}) => {
   return Number.isNaN(date.getTime()) ? undefined : date;
 };
 
-const mapAdzunaJob = (job = {}) => ({
-  title: String(job.title || '').trim(),
-  company: String(job.company?.display_name || 'Unknown Company').trim(),
-  location: String(job.location?.display_name || 'Remote').trim(),
-  description: normalizeJobDescription(job.description),
-  skills: extractSkillsFromText([job.title, job.description].filter(Boolean).join(' ')),
-  experience: normalizeExperienceText('Not specified'),
-  applyUrl: job.redirect_url,
-  source: 'adzuna',
-  sourceJobId: String(job.id || '').trim(),
-  remote: parseRemote(job),
-  type: /intern/i.test(job.title || '') ? 'internship' : mapAdzunaType(job.contract_time),
-  requirements: extractAdzunaRequirements(job),
-  salaryText: mapAdzunaSalary(job),
-  postedAt: parseAdzunaPostedAt(job),
-  status: 'active',
-  lastSyncedAt: new Date(),
-});
+const mapAdzunaJob = (job = {}) => {
+  const applyUrl = extractApplyUrl(job);
+  const title = String(job.title || '').trim();
+  const company = String(job.company?.display_name || 'Unknown Company').trim();
+  const description =
+    normalizeJobDescription(job.description) ||
+    normalizeJobDescription(`${title || 'Job'} at ${company || 'Unknown Company'}`);
+
+  return {
+    title,
+    company,
+    location: String(job.location?.display_name || 'Remote').trim(),
+    description,
+    skills: extractSkillsFromText([job.title, job.description].filter(Boolean).join(' ')),
+    experience: normalizeExperienceText('Not specified'),
+    applyUrl,
+    isDirectCompanyApply: isCareerPortalLink(applyUrl),
+    source: 'adzuna',
+    sourceJobId: String(job.id || '').trim(),
+    remote: parseRemote(job),
+    type: /intern/i.test(job.title || '') ? 'internship' : mapAdzunaType(job.contract_time),
+    requirements: extractAdzunaRequirements(job),
+    salaryText: mapAdzunaSalary(job),
+    postedAt: parseAdzunaPostedAt(job),
+    status: 'active',
+    lastSyncedAt: new Date(),
+  };
+};
 
 export const fetchAdzunaJobs = async () => {
   const appId = process.env.ADZUNA_APP_ID;
@@ -87,5 +98,5 @@ export const fetchAdzunaJobs = async () => {
 
   return jobs
     .map(mapAdzunaJob)
-    .filter((job) => job.title && job.company && job.location && job.applyUrl);
+    .filter((job) => job.title && job.company);
 };

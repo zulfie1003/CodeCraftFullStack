@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -197,7 +198,7 @@ function Landing() {
                     { icon: BriefcaseBusiness, label: "Jobs" },
                   ].map(({ icon: Icon, label, active }) => (
                     <span key={label} className={`sidebar-item${active ? " active" : ""}`}>
-                      <Icon size={20} />
+                      {createElement(Icon, { size: 20 })}
                       {label}
                     </span>
                   ))}
@@ -282,7 +283,7 @@ function Landing() {
           <div className="card-grid card-grid-four">
             {ROLE_CARDS.map(({ icon: Icon, title, text, meta, accent }) => (
               <article key={title} className={`info-card ${accent}`}>
-                <span className="info-card-icon"><Icon size={22} /></span>
+                <span className="info-card-icon">{createElement(Icon, { size: 22 })}</span>
                 <h3>{title}</h3>
                 <p>{text}</p>
                 <div className="card-meta">
@@ -352,7 +353,7 @@ function Landing() {
           <div className="card-grid card-grid-three compact-grid">
             {FEATURES.map(({ icon: Icon, title, text }) => (
               <article key={title} className="feature-card">
-                <span className="feature-icon"><Icon size={22} /></span>
+                <span className="feature-icon">{createElement(Icon, { size: 22 })}</span>
                 <h3>{title}</h3>
                 <p>{text}</p>
               </article>
@@ -363,7 +364,7 @@ function Landing() {
             {SKILLS.map(({ icon: Icon, title, text }) => (
               <article key={title} className="skill-card">
                 <div className="skill-card-top">
-                  <span className="skill-icon"><Icon size={22} /></span>
+                  <span className="skill-icon">{createElement(Icon, { size: 22 })}</span>
                 </div>
                 <h3>{title}</h3>
                 <p>{text}</p>

@@ -1,5 +1,10 @@
 import Job from '../models/Job.model.js';
 import User from '../models/User.model.js';
+import {
+  aggregateJobsFromProviders,
+  filterRecentJobs,
+  rankJobs,
+} from '../services/jobAggregator.service.js';
 import { resolveUserJobProfile, serializeRecommendedJob } from '../services/jobProfile.service.js';
 import { syncExternalJobs } from '../services/jobSync.service.js';
 import {
@@ -228,6 +233,85 @@ const sortRecommendedJobs = (left, right) => {
   return new Date(right.postedAt || right.createdAt).getTime() - new Date(left.postedAt || left.createdAt).getTime();
 };
 
+const buildTitleCompanyKey = (job = {}) =>
+  [job.title, job.company]
+    .map((item) =>
+      String(item || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    )
+    .join('::');
+
+const mergeJobsByTitleCompany = (jobs = []) => {
+  const seen = new Set();
+
+  return jobs.filter((job) => {
+    const key = buildTitleCompanyKey(job);
+
+    if (!job.title || !job.company || !key || seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+};
+
+const matchesText = (value = '', search = '') =>
+  String(value || '').toLowerCase().includes(String(search || '').toLowerCase());
+
+const filterExternalJobsForQuery = (jobs = [], query = {}) =>
+  jobs.filter((job) => {
+    if (query.location && !matchesText(job.location, query.location)) return false;
+    if (query.source && String(query.source).toLowerCase() !== 'all') {
+      if (String(job.source || '').toLowerCase() !== String(query.source).toLowerCase()) {
+        return false;
+      }
+    }
+    if (query.workType === 'internship' && job.type !== 'internship') return false;
+    if (query.workType === 'job' && job.type === 'internship') return false;
+    if (query.experience && !matchesText(job.experience, query.experience)) return false;
+
+    const searchableText = [
+      job.title,
+      job.company,
+      job.location,
+      job.description,
+      ...(Array.isArray(job.skills) ? job.skills : []),
+      ...(Array.isArray(job.requirements) ? job.requirements : []),
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    if (query.search && !matchesText(searchableText, query.search)) return false;
+    if (query.domain && !matchesText(searchableText, query.domain)) return false;
+
+    const requestedSkills = normalizeSkills(query.skills);
+    if (requestedSkills.length) {
+      const jobSkills = normalizeSkills(job.skills);
+      const jobSkillSet = new Set(jobSkills.map((skill) => skill.toLowerCase()));
+      return requestedSkills.some((skill) => jobSkillSet.has(skill.toLowerCase()));
+    }
+
+    return true;
+  });
+
+const resolveRequestedExternalProviders = (source = '') => {
+  const normalizedSource = String(source || '').trim().toLowerCase();
+
+  if (!normalizedSource || normalizedSource === 'all') {
+    return ['adzuna', 'rapidapi'];
+  }
+
+  if (['adzuna', 'rapidapi'].includes(normalizedSource)) {
+    return [normalizedSource];
+  }
+
+  return [];
+};
+
 export const createJob = async (req, res, next) => {
   try {
     const jobPayload = buildJobPayload(req.body);
@@ -318,20 +402,37 @@ export const getRecommendedJobs = async (req, res, next) => {
   try {
     const page = parsePaginationValue(req.query.page, 1);
     const limit = Math.min(parsePaginationValue(req.query.limit, DEFAULT_LIMIT), MAX_LIMIT);
+    const onlyCompanyJobs = req.query.onlyCompanyJobs === 'true';
     const profile = await resolveUserJobProfile(req.user.id);
     const userSkills = profile.userSkills;
+    const requestedExternalProviders = resolveRequestedExternalProviders(req.query.source);
 
     const filter = buildJobFilters(req.query, {
       bookmarkedOnly: req.query.bookmarked === 'true',
       bookmarkedJobIds: [...profile.bookmarkSet],
     });
 
-    const jobs = await Job.find(filter).populate('postedBy', 'name role');
-    const recommendedJobs = jobs
-      .map((job) =>
-        serializeRecommendedJob(job, userSkills, profile.bookmarkSet, profile.userExperienceLevel)
-      )
-      .sort(sortRecommendedJobs);
+    const [jobs, externalResult] = await Promise.all([
+      Job.find(filter).populate('postedBy', 'name role'),
+      req.query.bookmarked === 'true' || requestedExternalProviders.length === 0
+        ? Promise.resolve({ jobs: [], providers: [] })
+        : aggregateJobsFromProviders(requestedExternalProviders),
+    ]);
+
+    const storedJobs = jobs.map((job) =>
+      serializeRecommendedJob(job, userSkills, profile.bookmarkSet, profile.userExperienceLevel)
+    );
+    const externalJobs = filterExternalJobsForQuery(externalResult.jobs, req.query);
+    const mergedJobs = mergeJobsByTitleCompany([...storedJobs, ...externalJobs]);
+    const recentJobs = filterRecentJobs(mergedJobs);
+    const companyFilteredJobs = onlyCompanyJobs
+      ? recentJobs.filter((job) => job.isDirectCompanyApply === true)
+      : recentJobs;
+    const recommendedJobs = rankJobs(companyFilteredJobs, {
+      skills: userSkills,
+      role: req.query.domain || req.query.search || profile.role,
+      location: req.query.location || profile.location,
+    });
 
     const paginatedJobs = recommendedJobs.slice((page - 1) * limit, page * limit);
     const averageMatch = recommendedJobs.length
@@ -347,6 +448,7 @@ export const getRecommendedJobs = async (req, res, next) => {
         totalJobs: recommendedJobs.length,
         averageMatch,
         bookmarkedCount: profile.bookmarkSet.size,
+        providers: externalResult.providers,
       },
       pagination: {
         total: recommendedJobs.length,

@@ -48,6 +48,8 @@ const WORK_TYPE_OPTIONS = [
   { label: "Internships only", value: "internship" },
 ];
 
+const hasPersistedJobId = (job = {}) => /^[a-f0-9]{24}$/i.test(String(job._id || ""));
+
 const DOMAIN_SUGGESTIONS = [
   "Software Developer",
   "Frontend Developer",
@@ -351,12 +353,14 @@ function Jobs() {
   ]);
 
   useEffect(() => {
-    setSelectedJob((current) => {
-      if (!current) {
-        return null;
-      }
+    void Promise.resolve().then(() => {
+      setSelectedJob((current) => {
+        if (!current) {
+          return null;
+        }
 
-      return jobs.find((job) => job._id === current._id) || null;
+        return jobs.find((job) => job._id === current._id) || null;
+      });
     });
   }, [jobs]);
 
@@ -423,6 +427,11 @@ function Jobs() {
   };
 
   const handleBookmarkToggle = async (job) => {
+    if (!hasPersistedJobId(job)) {
+      setError("This live job can be bookmarked after it is synced into the job database.");
+      return;
+    }
+
     const nextBookmarkedValue = !job.bookmarked;
 
     setBookmarkingJobId(job._id);
@@ -703,7 +712,10 @@ function Jobs() {
                 const companyInitials = getCompanyInitials(job.company);
 
                 return (
-                  <article key={job._id} className={`job-card ${tone.chip}`}>
+                  <article
+                    key={job._id || `${job.source}-${job.title}-${job.company}`}
+                    className={`job-card ${tone.chip}`}
+                  >
                     <div className="job-card-top">
                       <div className="job-card-brand">
                         <div className="job-logo-fallback">{companyInitials}</div>
@@ -719,6 +731,11 @@ function Jobs() {
                               </button>
                             </h3>
                             <span className="job-source-chip">{formatSource(job.source)}</span>
+                            {job.isDirectCompanyApply && (
+                              <span className="job-source-chip job-source-chip--direct">
+                                Company apply
+                              </span>
+                            )}
                           </div>
                           <p className="company-name">
                             <Building2 size={13} />
@@ -852,7 +869,7 @@ function Jobs() {
                         <button
                           type="button"
                           className="bookmark-btn"
-                          disabled={bookmarkingJobId === job._id}
+                          disabled={bookmarkingJobId === job._id || !hasPersistedJobId(job)}
                           onClick={() => handleBookmarkToggle(job)}
                         >
                           {job.bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
@@ -869,15 +886,21 @@ function Jobs() {
                         </button>
                       </div>
 
-                      <a
-                        className="apply-btn"
-                        href={job.applyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Apply Externally
-                        <ArrowUpRight size={16} />
-                      </a>
+                      {job.applyUrl ? (
+                        <a
+                          className="apply-btn"
+                          href={job.applyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Apply Externally
+                          <ArrowUpRight size={16} />
+                        </a>
+                      ) : (
+                        <button type="button" className="apply-btn" disabled>
+                          Apply link unavailable
+                        </button>
+                      )}
                     </div>
                   </article>
                 );
@@ -1184,22 +1207,28 @@ function Jobs() {
                 <button
                   type="button"
                   className="bookmark-btn"
-                  disabled={bookmarkingJobId === selectedJob._id}
+                  disabled={bookmarkingJobId === selectedJob._id || !hasPersistedJobId(selectedJob)}
                   onClick={() => handleBookmarkToggle(selectedJob)}
                 >
                   {selectedJob.bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
                   {selectedJob.bookmarked ? "Bookmarked" : "Bookmark"}
                 </button>
 
-                <a
-                  className="apply-btn"
-                  href={selectedJob.applyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Apply Externally
-                  <ArrowUpRight size={16} />
-                </a>
+                {selectedJob.applyUrl ? (
+                  <a
+                    className="apply-btn"
+                    href={selectedJob.applyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Apply Externally
+                    <ArrowUpRight size={16} />
+                  </a>
+                ) : (
+                  <button type="button" className="apply-btn" disabled>
+                    Apply link unavailable
+                  </button>
+                )}
               </div>
             </div>
           </div>

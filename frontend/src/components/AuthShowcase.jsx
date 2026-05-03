@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -63,7 +64,7 @@ function AuthShowcase({
           {HIGHLIGHTS.map(({ icon: Icon, title: itemTitle, text }) => (
             <article key={itemTitle} className="auth-highlight-card">
               <span className="auth-highlight-icon">
-                <Icon size={18} />
+                {createElement(Icon, { size: 18 })}
               </span>
               <h3>{itemTitle}</h3>
               <p>{text}</p>

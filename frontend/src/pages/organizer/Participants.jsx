@@ -45,7 +45,7 @@ const Participants = () => {
   };
 
   useEffect(() => {
-    loadRegistrations("");
+    void Promise.resolve().then(() => loadRegistrations(""));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

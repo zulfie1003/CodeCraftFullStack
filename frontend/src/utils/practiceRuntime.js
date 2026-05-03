@@ -134,6 +134,7 @@ export const getCodeTemplate = (language, problem) => {
 };
 
 export const validateCode = (code, language) => {
+  void language;
   const trimmedCode = code.trim();
 
   if (!trimmedCode) {

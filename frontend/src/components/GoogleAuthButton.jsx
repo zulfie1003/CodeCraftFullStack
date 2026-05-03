@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { getHomePathForRole, storeAuthSession } from "../utils/auth";
@@ -116,7 +116,6 @@ function GoogleAuthButton({ role, intent = "signin" }) {
     let isMounted = true;
 
     if (!googleConfigured) {
-      setGoogleReady(false);
       return undefined;
     }
 
@@ -139,7 +138,7 @@ function GoogleAuthButton({ role, intent = "signin" }) {
     };
   }, [googleConfigured]);
 
-  credentialHandlerRef.current = async ({ credential }) => {
+  const handleCredential = useCallback(async ({ credential }) => {
     if (!credential) {
       setGoogleError("Google sign-in did not return a valid credential.");
       return;
@@ -161,7 +160,11 @@ function GoogleAuthButton({ role, intent = "signin" }) {
     } finally {
       setGoogleLoading(false);
     }
-  };
+  }, [navigate, role]);
+
+  useEffect(() => {
+    credentialHandlerRef.current = handleCredential;
+  }, [handleCredential]);
 
   useEffect(() => {
     if (!googleConfigured || !googleReady || !buttonRef.current || !window.google?.accounts?.id) {

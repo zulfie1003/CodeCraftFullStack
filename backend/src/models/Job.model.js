@@ -77,11 +77,14 @@ const jobSchema = new mongoose.Schema({
   },
   applyUrl: {
     type: String,
-    required: true,
     validate: {
-      validator: (value) => isValidHttpUrl(value),
+      validator: (value) => !value || isValidHttpUrl(value),
       message: 'applyUrl must be a valid http(s) URL'
     }
+  },
+  isDirectCompanyApply: {
+    type: Boolean,
+    default: false
   },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -109,6 +112,8 @@ jobSchema.pre('validate', function(next) {
   this.company = String(this.company || '').trim();
   this.location = String(this.location || '').trim();
   this.description = normalizeJobDescription(this.description);
+  this.applyUrl = String(this.applyUrl || '').trim();
+  this.isDirectCompanyApply = this.isDirectCompanyApply === true;
   this.skills = normalizeSkills(this.skills);
   this.requirements = normalizeStringArray(this.requirements);
   this.experience = normalizeExperienceText(this.experience, this.experienceLevel);

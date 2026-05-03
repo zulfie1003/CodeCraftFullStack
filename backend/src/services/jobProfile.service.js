@@ -7,12 +7,13 @@ import {
   normalizeExperienceText,
   normalizeSkills,
 } from '../utils/jobMatching.js';
+import { isCareerPortalLink } from '../utils/jobLinks.js';
 
 const toPlainObject = (value) => (typeof value?.toObject === 'function' ? value.toObject() : value);
 
 export const resolveUserJobProfile = async (userId) => {
   const [user, studentProfile] = await Promise.all([
-    User.findById(userId).select('skills bookmarkedJobs resume role'),
+    User.findById(userId).select('skills bookmarkedJobs resume role location'),
     StudentProfile.findOne({ user: userId }).select('skills resume experienceLevel'),
   ]);
 
@@ -25,6 +26,8 @@ export const resolveUserJobProfile = async (userId) => {
     user,
     studentProfile,
     userSkills,
+    role: user?.role || '',
+    location: user?.location || '',
     userExperienceLevel: studentProfile?.experienceLevel || '',
     bookmarkSet: new Set((user?.bookmarkedJobs || []).map((jobId) => String(jobId))),
   };
@@ -68,6 +71,8 @@ export const serializeRecommendedJob = (
 
   return {
     ...plainJob,
+    isDirectCompanyApply:
+      plainJob.isDirectCompanyApply === true || isCareerPortalLink(plainJob.applyUrl),
     skills: normalizedJobSkills,
     experience,
     experienceLevel: requiredExperienceLevel,

@@ -3,6 +3,7 @@ import {
   normalizeExperienceText,
   normalizeJobDescription,
 } from '../../utils/jobMatching.js';
+import { extractApplyUrl, isCareerPortalLink } from '../../utils/jobLinks.js';
 
 const readRapidApiJobList = (payload) => {
   if (Array.isArray(payload)) {
@@ -21,16 +22,6 @@ const readRapidApiJobList = (payload) => {
 };
 
 const pickValue = (...values) => values.find((value) => String(value || '').trim());
-const pickUrl = (...values) =>
-  values.find((value) => {
-    try {
-      const url = new URL(String(value || '').trim());
-      return ['http:', 'https:'].includes(url.protocol);
-    } catch {
-      return false;
-    }
-  });
-
 const envValue = (name, fallback = '') => {
   const value = String(process.env[name] || '').trim();
 
@@ -50,37 +41,6 @@ const buildSearchQuery = () => {
   }
 
   return `${query} in ${location}`;
-};
-
-const getApplyUrl = (job = {}) => {
-  const applyOption = Array.isArray(job.apply_options)
-    ? job.apply_options.find((option) => pickValue(option?.apply_link, option?.url))
-    : null;
-
-  const directUrl = pickUrl(
-    job.job_apply_link,
-    job.apply_link,
-    job.url,
-    job.job_google_link,
-    job.job_publisher_link,
-    applyOption?.apply_link,
-    applyOption?.url
-  );
-
-  if (directUrl) {
-    return directUrl;
-  }
-
-  const title = pickValue(job.job_title, job.title);
-  const company = pickValue(job.employer_name, job.company, job.company_name);
-  const location = getLocation(job);
-  const searchQuery = [title, company, location].filter(Boolean).join(' ');
-
-  if (!searchQuery) {
-    return '';
-  }
-
-  return `https://www.google.com/search?q=${encodeURIComponent(`${searchQuery} apply`)}`;
 };
 
 const getLocation = (job = {}) =>
@@ -200,19 +160,25 @@ const parsePostedAt = (job = {}) => {
 
 const mapRapidApiJob = (job = {}) => {
   const title = pickValue(job.job_title, job.title);
+  const company = String(
+    pickValue(job.employer_name, job.company, job.company_name) || 'Unknown Company'
+  ).trim();
   const description = pickValue(job.job_description, job.description, job.summary);
+  const normalizedDescription =
+    normalizeJobDescription(description || '') ||
+    normalizeJobDescription(`${title || 'Job'} at ${company || 'Unknown Company'}`);
   const remoteText = [title, description, getLocation(job)].filter(Boolean).join(' ');
   const requiredSkills = Array.isArray(job.job_required_skills)
     ? job.job_required_skills
     : [];
 
+  const applyUrl = extractApplyUrl(job);
+
   return {
     title: String(title || '').trim(),
-    company: String(
-      pickValue(job.employer_name, job.company, job.company_name) || 'Unknown Company'
-    ).trim(),
+    company,
     location: String(getLocation(job) || 'Remote').trim(),
-    description: normalizeJobDescription(description || ''),
+    description: normalizedDescription,
     skills: extractSkillsFromText(
       [title, description, ...requiredSkills].filter(Boolean).join(' ')
     ),
@@ -224,7 +190,8 @@ const mapRapidApiJob = (job = {}) => {
         job.experience
       )
     ),
-    applyUrl: getApplyUrl(job),
+    applyUrl,
+    isDirectCompanyApply: isCareerPortalLink(applyUrl),
     source: 'rapidapi',
     sourceJobId: String(pickValue(job.job_id, job.id) || '').trim(),
     remote: job.job_is_remote === true || /remote|work from home|hybrid/i.test(remoteText),
@@ -308,7 +275,7 @@ export const fetchRapidApiJobs = async () => {
       missingApplyUrl: 0,
     }
   );
-  const validJobs = mappedJobs.filter((job) => job.title && job.company && job.location && job.applyUrl);
+  const validJobs = mappedJobs.filter((job) => job.title && job.company);
 
   if (jobs.length > 0) {
     console.log('RapidAPI jobs mapped:', {

@@ -43,7 +43,7 @@ const Applicants = () => {
   };
 
   useEffect(() => {
-    loadData(INITIAL_FILTERS);
+    void Promise.resolve().then(() => loadData(INITIAL_FILTERS));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
