@@ -130,10 +130,10 @@ export const syncExternalJobs = async () => {
       providers: [],
     };
 
-    for (const result of providerResults) {
+    for (const [index, result] of providerResults.entries()) {
       if (result.status !== 'fulfilled') {
         syncSummary.providers.push({
-          name: 'unknown',
+          name: EXTERNAL_PROVIDERS[index]?.name || 'unknown',
           status: 'failed',
           error: result.reason?.message || 'Provider sync failed',
         });

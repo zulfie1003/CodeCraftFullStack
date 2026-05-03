@@ -111,6 +111,27 @@ const formatJobType = (value = "") => {
   }
 };
 
+const formatExperienceSignal = (job = {}) => {
+  const experience = String(job.experience || "").trim();
+  const level = String(job.experienceLevel || "").trim().toLowerCase();
+  const searchableText = [job.title, experience, job.description].filter(Boolean).join(" ");
+  const hasYearRequirement = /\b([2-9]|\d{2,})\s*\+?\s*(years?|yrs?)\b/i.test(searchableText);
+
+  if (level === "fresher" || /fresher|fresh graduate|entry[-\s]?level|0\s*-\s*1|no experience/i.test(searchableText)) {
+    return experience && experience !== "Not specified"
+      ? `Fresher (${experience})`
+      : "Fresher / entry-level";
+  }
+
+  if (["junior", "mid", "senior"].includes(level) || hasYearRequirement || /experienced|senior|lead/i.test(searchableText)) {
+    return experience && experience !== "Not specified"
+      ? `Experienced (${experience})`
+      : "Experienced";
+  }
+
+  return experience || "Experience not specified";
+};
+
 const getDescriptionPreview = (value = "", maxLength = 220) => {
   const cleaned = String(value || "").replace(/\s+/g, " ").trim();
 
@@ -125,12 +146,33 @@ const getDescriptionPreview = (value = "", maxLength = 220) => {
   return `${cleaned.slice(0, maxLength - 1).trim()}...`;
 };
 
+const getJobOverview = (job = {}) => {
+  const descriptionPreview = getDescriptionPreview(job.description, 180);
+
+  if (descriptionPreview && descriptionPreview !== "No job description shared yet.") {
+    return descriptionPreview;
+  }
+
+  return `${job.company || "The employer"} is hiring for ${job.title || "this role"} in ${job.location || "the listed location"}. Review the full job description and apply through the original source.`;
+};
+
 const getDescriptionParagraphs = (value = "") =>
   String(value || "")
     .replace(/\r/g, "\n")
     .split(/\n+/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
+
+const getJobFacts = (job = {}) => [
+  { label: "Company", value: job.company },
+  { label: "Location", value: job.location },
+  { label: "Required experience", value: formatExperienceSignal(job) },
+  { label: "Job type", value: formatJobType(job.type) },
+  { label: "Work mode", value: job.remote ? "Remote / hybrid mentioned" : "On-site or not specified" },
+  { label: "Salary", value: job.salaryText },
+  { label: "Source", value: formatSource(job.source) },
+  { label: "Posted", value: formatPostedDate(job.createdAt) },
+].filter((item) => item.value);
 
 function Jobs() {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
@@ -558,7 +600,11 @@ function Jobs() {
                       </span>
                       <span>
                         <BriefcaseBusiness size={13} />
-                        {job.experience || "Not specified"}
+                        {formatExperienceSignal(job)}
+                      </span>
+                      <span>
+                        <BookOpen size={13} />
+                        {formatJobType(job.type)}
                       </span>
                       <span>
                         <Clock3 size={13} />
@@ -566,13 +612,16 @@ function Jobs() {
                       </span>
                     </div>
 
-                    <p className="job-description">{getDescriptionPreview(job.description)}</p>
+                    <section className="job-overview-panel">
+                      <h4>Job overview</h4>
+                      <p>{getJobOverview(job)}</p>
+                    </section>
 
                     <div className="skills-section">
                       <div className="skills-subsection">
                         <h4 className="skills-label">
                           <BookOpen size={14} />
-                          Required skills for this role
+                          Key skills
                         </h4>
                         <div className="skills-pills">
                           {job.skills.length ? (
@@ -586,6 +635,17 @@ function Jobs() {
                               The job source did not list explicit skills for this role.
                             </span>
                           )}
+                        </div>
+                      </div>
+
+                      <div className="job-signal-grid">
+                        <div className="job-signal-card">
+                          <span>Required experience</span>
+                          <strong>{formatExperienceSignal(job)}</strong>
+                        </div>
+                        <div className="job-signal-card">
+                          <span>Location</span>
+                          <strong>{job.location || "Not specified"}</strong>
                         </div>
                       </div>
 
@@ -828,6 +888,10 @@ function Jobs() {
                 </span>
                 <span>
                   <BriefcaseBusiness size={13} />
+                  {formatExperienceSignal(selectedJob)}
+                </span>
+                <span>
+                  <BookOpen size={13} />
                   {formatJobType(selectedJob.type)}
                 </span>
                 <span>
@@ -840,9 +904,26 @@ function Jobs() {
                 </span>
               </div>
 
+              <section className="job-modal-panel">
+                <h3>Small overview</h3>
+                <p className="job-modal-overview">{getJobOverview(selectedJob)}</p>
+              </section>
+
+              <section className="job-modal-panel">
+                <h3>Job facts</h3>
+                <dl className="job-facts-grid">
+                  {getJobFacts(selectedJob).map((item) => (
+                    <div className="job-fact" key={item.label}>
+                      <dt>{item.label}</dt>
+                      <dd>{item.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+
               <div className="job-modal-panels">
                 <section className="job-modal-panel">
-                  <h3>Required skills</h3>
+                  <h3>Key skills</h3>
                   <div className="skills-pills">
                     {selectedJob.skills.length ? (
                       selectedJob.skills.map((skill) => (
@@ -911,7 +992,7 @@ function Jobs() {
               </div>
 
               <section className="job-modal-panel">
-                <h3>Job description</h3>
+                <h3>Full job description</h3>
                 <div className="job-description-detail">
                   {getDescriptionParagraphs(selectedJob.description).length ? (
                     getDescriptionParagraphs(selectedJob.description).map((paragraph) => (

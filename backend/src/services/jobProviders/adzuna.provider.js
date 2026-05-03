@@ -9,6 +9,28 @@ const parseRemote = (job = {}) =>
     [job.title, job.description, job.location?.display_name].filter(Boolean).join(' ')
   );
 
+const mapAdzunaType = (contractTime = '') => {
+  const normalizedValue = String(contractTime || '').toLowerCase();
+
+  if (normalizedValue.includes('part')) return 'parttime';
+  if (normalizedValue.includes('contract')) return 'contract';
+  return 'fulltime';
+};
+
+const mapAdzunaSalary = (job = {}) => {
+  if (!job.salary_min && !job.salary_max) {
+    return '';
+  }
+
+  const range = [job.salary_min, job.salary_max].filter(Boolean).join(' - ');
+  return `INR ${range}`.trim();
+};
+
+const extractAdzunaRequirements = (job = {}) =>
+  [job.category?.label, job.contract_time, job.contract_type]
+    .map((item) => String(item || '').trim())
+    .filter(Boolean);
+
 const mapAdzunaJob = (job = {}) => ({
   title: String(job.title || '').trim(),
   company: String(job.company?.display_name || 'Unknown Company').trim(),
@@ -20,7 +42,9 @@ const mapAdzunaJob = (job = {}) => ({
   source: 'adzuna',
   sourceJobId: String(job.id || '').trim(),
   remote: parseRemote(job),
-  type: /intern/i.test(job.title || '') ? 'internship' : 'fulltime',
+  type: /intern/i.test(job.title || '') ? 'internship' : mapAdzunaType(job.contract_time),
+  requirements: extractAdzunaRequirements(job),
+  salaryText: mapAdzunaSalary(job),
   status: 'active',
   lastSyncedAt: new Date(),
 });
