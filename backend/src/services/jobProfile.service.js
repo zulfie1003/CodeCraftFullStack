@@ -1,8 +1,9 @@
 import StudentProfile from '../models/StudentProfile.model.js';
 import User from '../models/User.model.js';
 import {
-  computeMatchBreakdown,
+  computeWeightedMatchBreakdown,
   extractSkillsFromText,
+  inferExperienceRequirement,
   normalizeExperienceText,
   normalizeSkills,
 } from '../utils/jobMatching.js';
@@ -24,6 +25,7 @@ export const resolveUserJobProfile = async (userId) => {
     user,
     studentProfile,
     userSkills,
+    userExperienceLevel: studentProfile?.experienceLevel || '',
     bookmarkSet: new Set((user?.bookmarkedJobs || []).map((jobId) => String(jobId))),
   };
 };
@@ -42,15 +44,34 @@ export const getJobSkills = (job = {}) => {
   );
 };
 
-export const serializeRecommendedJob = (job, userSkills = [], bookmarkSet = new Set()) => {
+export const serializeRecommendedJob = (
+  job,
+  userSkills = [],
+  bookmarkSet = new Set(),
+  userExperienceLevel = ''
+) => {
   const plainJob = toPlainObject(job);
   const normalizedJobSkills = getJobSkills(plainJob);
-  const match = computeMatchBreakdown(userSkills, normalizedJobSkills);
+  const inferredExperience = inferExperienceRequirement(
+    plainJob.description,
+    plainJob.requirements,
+    plainJob.title
+  );
+  const experience =
+    inferredExperience.experience ||
+    normalizeExperienceText(plainJob.experience, plainJob.experienceLevel);
+  const requiredExperienceLevel = inferredExperience.experienceLevel || plainJob.experienceLevel;
+  const match = computeWeightedMatchBreakdown(userSkills, normalizedJobSkills, {
+    userExperienceLevel,
+    requiredExperienceLevel,
+  });
 
   return {
     ...plainJob,
     skills: normalizedJobSkills,
-    experience: normalizeExperienceText(plainJob.experience, plainJob.experienceLevel),
+    experience,
+    experienceLevel: requiredExperienceLevel,
+    userExperienceLevel,
     bookmarked: bookmarkSet.has(String(plainJob._id)),
     ...match,
   };

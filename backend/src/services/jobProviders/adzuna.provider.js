@@ -31,6 +31,11 @@ const extractAdzunaRequirements = (job = {}) =>
     .map((item) => String(item || '').trim())
     .filter(Boolean);
 
+const parseAdzunaPostedAt = (job = {}) => {
+  const date = new Date(job.created);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+};
+
 const mapAdzunaJob = (job = {}) => ({
   title: String(job.title || '').trim(),
   company: String(job.company?.display_name || 'Unknown Company').trim(),
@@ -45,6 +50,7 @@ const mapAdzunaJob = (job = {}) => ({
   type: /intern/i.test(job.title || '') ? 'internship' : mapAdzunaType(job.contract_time),
   requirements: extractAdzunaRequirements(job),
   salaryText: mapAdzunaSalary(job),
+  postedAt: parseAdzunaPostedAt(job),
   status: 'active',
   lastSyncedAt: new Date(),
 });

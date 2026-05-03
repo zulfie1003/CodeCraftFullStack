@@ -24,6 +24,8 @@ import { buildLearningPriorities, getCompanyInitials } from "../../utils/jobInsi
 
 const INITIAL_FILTERS = {
   search: "",
+  workType: "both",
+  domain: "",
   location: "",
   skills: "",
   experience: "",
@@ -38,6 +40,48 @@ const SOURCE_OPTIONS = [
   { label: "RapidAPI", value: "rapidapi" },
   { label: "Naukri Redirects", value: "naukri" },
   { label: "Manual", value: "manual" },
+];
+
+const WORK_TYPE_OPTIONS = [
+  { label: "Jobs + Internships", value: "both" },
+  { label: "Jobs only", value: "job" },
+  { label: "Internships only", value: "internship" },
+];
+
+const DOMAIN_SUGGESTIONS = [
+  "Software Developer",
+  "Frontend Developer",
+  "Backend Developer",
+  "Full Stack Developer",
+  "Data Analyst",
+  "Data Science",
+  "Machine Learning",
+  "DevOps",
+  "Cloud Engineer",
+  "Cybersecurity",
+  "UI/UX Design",
+  "Product Management",
+  "Sales",
+  "Marketing",
+  "Business Development",
+  "Human Resources",
+  "Finance",
+  "Customer Support",
+];
+
+const LOCATION_SUGGESTIONS = [
+  "Remote",
+  "Bengaluru",
+  "Hyderabad",
+  "Pune",
+  "Mumbai",
+  "Delhi",
+  "Gurugram",
+  "Noida",
+  "Chennai",
+  "Kolkata",
+  "Ahmedabad",
+  "India",
 ];
 
 const getMatchTone = (matchScore) => {
@@ -111,22 +155,58 @@ const formatJobType = (value = "") => {
   }
 };
 
+const formatExperienceLevel = (value = "") => {
+  switch (value) {
+    case "fresher":
+      return "Fresher";
+    case "junior":
+      return "Junior";
+    case "mid":
+      return "Mid-level";
+    case "senior":
+      return "Senior";
+    default:
+      return value || "Not set";
+  }
+};
+
 const formatExperienceSignal = (job = {}) => {
   const experience = String(job.experience || "").trim();
   const level = String(job.experienceLevel || "").trim().toLowerCase();
-  const searchableText = [job.title, experience, job.description].filter(Boolean).join(" ");
-  const hasYearRequirement = /\b([2-9]|\d{2,})\s*\+?\s*(years?|yrs?)\b/i.test(searchableText);
+  const searchableText = [job.title, experience, job.description, ...(job.requirements || [])]
+    .filter(Boolean)
+    .join(" ");
+  const yearRangeMatch = searchableText.match(/\b(\d{1,2})\s*(?:-|to)\s*(\d{1,2})\s*(?:years?|yrs?)\b/i);
+  const plusYearMatch = searchableText.match(/\b(\d{1,2})\s*\+?\s*(?:years?|yrs?)\b/i);
+  const monthMatch = searchableText.match(/\b(\d{1,2})\s*\+?\s*(?:months?|mos?)\b/i);
+  const explicitExperience =
+    yearRangeMatch
+      ? `${yearRangeMatch[1]}-${yearRangeMatch[2]} years`
+      : plusYearMatch
+        ? `${plusYearMatch[1]}+ years`
+        : monthMatch
+          ? `${monthMatch[1]}+ months`
+          : "";
 
-  if (level === "fresher" || /fresher|fresh graduate|entry[-\s]?level|0\s*-\s*1|no experience/i.test(searchableText)) {
+  if (explicitExperience) {
+    const years = Number.parseInt(yearRangeMatch?.[1] || plusYearMatch?.[1] || "0", 10);
+    return years >= 2 ? `Experienced (${explicitExperience})` : `Fresher (${explicitExperience})`;
+  }
+
+  if (/fresher|fresh graduate|entry[-\s]?level|0\s*-\s*1|no experience/i.test(searchableText)) {
     return experience && experience !== "Not specified"
       ? `Fresher (${experience})`
       : "Fresher / entry-level";
   }
 
-  if (["junior", "mid", "senior"].includes(level) || hasYearRequirement || /experienced|senior|lead/i.test(searchableText)) {
+  if (["junior", "mid", "senior"].includes(level) || /experienced|senior|lead/i.test(searchableText)) {
     return experience && experience !== "Not specified"
       ? `Experienced (${experience})`
       : "Experienced";
+  }
+
+  if (level === "fresher" && experience && !["Not specified", "0-1 years"].includes(experience)) {
+    return experience;
   }
 
   return experience || "Experience not specified";
@@ -167,11 +247,14 @@ const getJobFacts = (job = {}) => [
   { label: "Company", value: job.company },
   { label: "Location", value: job.location },
   { label: "Required experience", value: formatExperienceSignal(job) },
+  { label: "Your experience level", value: formatExperienceLevel(job.userExperienceLevel) },
+  { label: "Skill fit", value: `${job.skillMatchScore ?? job.matchScore ?? 0}%` },
+  { label: "Experience fit", value: `${job.experienceMatchScore ?? 100}%` },
   { label: "Job type", value: formatJobType(job.type) },
   { label: "Work mode", value: job.remote ? "Remote / hybrid mentioned" : "On-site or not specified" },
   { label: "Salary", value: job.salaryText },
   { label: "Source", value: formatSource(job.source) },
-  { label: "Posted", value: formatPostedDate(job.createdAt) },
+  { label: "Posted", value: formatPostedDate(job.postedAt || job.createdAt) },
 ].filter((item) => item.value);
 
 function Jobs() {
@@ -196,6 +279,7 @@ function Jobs() {
   const [selectedJob, setSelectedJob] = useState(null);
 
   const deferredSearch = useDeferredValue(filters.search);
+  const deferredDomain = useDeferredValue(filters.domain);
   const deferredLocation = useDeferredValue(filters.location);
   const deferredSkills = useDeferredValue(filters.skills);
   const deferredExperience = useDeferredValue(filters.experience);
@@ -212,6 +296,8 @@ function Jobs() {
           params: {
             limit: 60,
             search: deferredSearch || undefined,
+            workType: filters.workType !== "both" ? filters.workType : undefined,
+            domain: deferredDomain || undefined,
             location: deferredLocation || undefined,
             skills: deferredSkills || undefined,
             experience: deferredExperience || undefined,
@@ -253,12 +339,14 @@ function Jobs() {
       ignore = true;
     };
   }, [
+    deferredDomain,
     deferredExperience,
     deferredLocation,
     deferredSearch,
     deferredSkills,
     filters.bookmarkedOnly,
     filters.source,
+    filters.workType,
     refreshTick,
   ]);
 
@@ -297,6 +385,23 @@ function Jobs() {
   const topJob = jobs[0] || null;
   const companiesCount = new Set(jobs.map((job) => job.company).filter(Boolean)).size;
   const bookmarkedInView = jobs.filter((job) => job.bookmarked).length;
+  const domainSuggestions = useMemo(() => {
+    const jobDomains = jobs.flatMap((job) => [
+      job.title,
+      ...(Array.isArray(job.skills) ? job.skills : []),
+    ]);
+
+    return [...new Set([...DOMAIN_SUGGESTIONS, ...jobDomains].filter(Boolean))]
+      .sort((left, right) => left.localeCompare(right))
+      .slice(0, 80);
+  }, [jobs]);
+  const locationSuggestions = useMemo(() => {
+    const jobLocations = jobs.map((job) => job.location).filter(Boolean);
+
+    return [...new Set([...LOCATION_SUGGESTIONS, ...jobLocations])]
+      .sort((left, right) => left.localeCompare(right))
+      .slice(0, 80);
+  }, [jobs]);
 
   const handleFilterChange = (field, value) => {
     setFilters((current) => ({
@@ -474,10 +579,48 @@ function Jobs() {
               <Filter size={18} />
               Refine recommendations
             </h2>
-            <p>Filter by skill, city, experience band, or source without losing the match ranking.</p>
+            <p>Choose jobs, internships, domain, location, experience band, or source without losing the match ranking.</p>
           </div>
 
+          <datalist id="job-domain-suggestions">
+            {domainSuggestions.map((domain) => (
+              <option key={domain} value={domain} />
+            ))}
+          </datalist>
+          <datalist id="job-location-suggestions">
+            {locationSuggestions.map((location) => (
+              <option key={location} value={location} />
+            ))}
+          </datalist>
+
           <div className="jobs-filter-grid">
+            <label className="filter-field">
+              <span>Role type</span>
+              <select
+                value={filters.workType}
+                onChange={(event) => handleFilterChange("workType", event.target.value)}
+              >
+                {WORK_TYPE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="filter-field">
+              <span>Domain</span>
+              <div className="filter-input">
+                <BriefcaseBusiness size={16} />
+                <input
+                  list="job-domain-suggestions"
+                  placeholder="Software dev, Sales..."
+                  value={filters.domain}
+                  onChange={(event) => handleFilterChange("domain", event.target.value)}
+                />
+              </div>
+            </label>
+
             <label className="filter-field filter-field--wide">
               <span>Search</span>
               <div className="filter-input">
@@ -495,6 +638,7 @@ function Jobs() {
               <div className="filter-input">
                 <MapPin size={16} />
                 <input
+                  list="job-location-suggestions"
                   placeholder="Bengaluru"
                   value={filters.location}
                   onChange={(event) => handleFilterChange("location", event.target.value)}
@@ -585,7 +729,10 @@ function Jobs() {
 
                       <div className="job-match-widget">
                         <strong>{job.matchScore}%</strong>
-                        <span>You are a {tone.badge.toLowerCase()}</span>
+                        <span>
+                          Skills {job.skillMatchScore ?? job.matchScore ?? 0}% · Exp{" "}
+                          {job.experienceMatchScore ?? 100}%
+                        </span>
                       </div>
                     </div>
 
@@ -608,7 +755,7 @@ function Jobs() {
                       </span>
                       <span>
                         <Clock3 size={13} />
-                        Posted {formatPostedDate(job.createdAt)}
+                        Posted {formatPostedDate(job.postedAt || job.createdAt)}
                       </span>
                     </div>
 
@@ -644,8 +791,20 @@ function Jobs() {
                           <strong>{formatExperienceSignal(job)}</strong>
                         </div>
                         <div className="job-signal-card">
+                          <span>Your experience fit</span>
+                          <strong>
+                            {job.experienceMatched
+                              ? "Meets requirement"
+                              : `${job.experienceMatchScore ?? 0}% fit`}
+                          </strong>
+                        </div>
+                        <div className="job-signal-card">
                           <span>Location</span>
                           <strong>{job.location || "Not specified"}</strong>
+                        </div>
+                        <div className="job-signal-card">
+                          <span>Skill fit</span>
+                          <strong>{job.skillMatchScore ?? job.matchScore ?? 0}%</strong>
                         </div>
                       </div>
 
@@ -896,11 +1055,13 @@ function Jobs() {
                 </span>
                 <span>
                   <Target size={13} />
-                  {selectedJob.matchScore}% match
+                  {selectedJob.matchScore}% match · Skills{" "}
+                  {selectedJob.skillMatchScore ?? selectedJob.matchScore ?? 0}% · Exp{" "}
+                  {selectedJob.experienceMatchScore ?? 100}%
                 </span>
                 <span>
                   <Clock3 size={13} />
-                  Posted {formatPostedDate(selectedJob.createdAt)}
+                  Posted {formatPostedDate(selectedJob.postedAt || selectedJob.createdAt)}
                 </span>
               </div>
 

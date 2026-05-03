@@ -21,6 +21,15 @@ const readRapidApiJobList = (payload) => {
 };
 
 const pickValue = (...values) => values.find((value) => String(value || '').trim());
+const pickUrl = (...values) =>
+  values.find((value) => {
+    try {
+      const url = new URL(String(value || '').trim());
+      return ['http:', 'https:'].includes(url.protocol);
+    } catch {
+      return false;
+    }
+  });
 
 const envValue = (name, fallback = '') => {
   const value = String(process.env[name] || '').trim();
@@ -48,14 +57,30 @@ const getApplyUrl = (job = {}) => {
     ? job.apply_options.find((option) => pickValue(option?.apply_link, option?.url))
     : null;
 
-  return pickValue(
+  const directUrl = pickUrl(
     job.job_apply_link,
     job.apply_link,
     job.url,
     job.job_google_link,
+    job.job_publisher_link,
     applyOption?.apply_link,
     applyOption?.url
   );
+
+  if (directUrl) {
+    return directUrl;
+  }
+
+  const title = pickValue(job.job_title, job.title);
+  const company = pickValue(job.employer_name, job.company, job.company_name);
+  const location = getLocation(job);
+  const searchQuery = [title, company, location].filter(Boolean).join(' ');
+
+  if (!searchQuery) {
+    return '';
+  }
+
+  return `https://www.google.com/search?q=${encodeURIComponent(`${searchQuery} apply`)}`;
 };
 
 const getLocation = (job = {}) =>
@@ -143,6 +168,36 @@ const getRequirements = (job = {}) => {
     .slice(0, 20);
 };
 
+const parsePostedAt = (job = {}) => {
+  const rawDate = pickValue(
+    job.job_posted_at_datetime_utc,
+    job.job_posted_at_datetime,
+    job.job_posted_at,
+    job.posted_at,
+    job.date_posted
+  );
+  const timestamp = Number(job.job_posted_at_timestamp || job.posted_at_timestamp);
+
+  if (Number.isFinite(timestamp) && timestamp > 0) {
+    const timestampMs = timestamp < 10000000000 ? timestamp * 1000 : timestamp;
+    const date = new Date(timestampMs);
+
+    if (!Number.isNaN(date.getTime())) {
+      return date;
+    }
+  }
+
+  if (rawDate) {
+    const date = new Date(rawDate);
+
+    if (!Number.isNaN(date.getTime())) {
+      return date;
+    }
+  }
+
+  return undefined;
+};
+
 const mapRapidApiJob = (job = {}) => {
   const title = pickValue(job.job_title, job.title);
   const description = pickValue(job.job_description, job.description, job.summary);
@@ -177,6 +232,7 @@ const mapRapidApiJob = (job = {}) => {
     experienceLevel: getExperienceLevel(job),
     requirements: getRequirements(job),
     salaryText: getSalaryText(job),
+    postedAt: parsePostedAt(job),
     status: 'active',
     lastSyncedAt: new Date(),
   };
@@ -198,8 +254,12 @@ export const fetchRapidApiJobs = async () => {
   const apiHost = envValue('RAPIDAPI_HOST', 'jsearch.p.rapidapi.com');
   const apiUrl = envValue('RAPIDAPI_JOBS_URL', 'https://jsearch.p.rapidapi.com/search-v2');
 
-  if (!apiKey || !apiHost || !apiUrl) {
-    return [];
+  if (!apiKey) {
+    throw new Error('RapidAPI key is missing. Set RAPIDAPI_KEY in the backend environment variables and restart/redeploy the backend.');
+  }
+
+  if (!apiHost || !apiUrl) {
+    throw new Error('RapidAPI host or jobs URL is missing. Set RAPIDAPI_HOST and RAPIDAPI_JOBS_URL in the backend environment variables.');
   }
 
   const url = new URL(apiUrl);
@@ -233,8 +293,37 @@ export const fetchRapidApiJobs = async () => {
 
   const payload = await response.json();
   const jobs = readRapidApiJobList(payload);
+  const mappedJobs = jobs.map(mapRapidApiJob);
+  const droppedSummary = mappedJobs.reduce(
+    (summary, job) => ({
+      missingTitle: summary.missingTitle + (job.title ? 0 : 1),
+      missingCompany: summary.missingCompany + (job.company ? 0 : 1),
+      missingLocation: summary.missingLocation + (job.location ? 0 : 1),
+      missingApplyUrl: summary.missingApplyUrl + (job.applyUrl ? 0 : 1),
+    }),
+    {
+      missingTitle: 0,
+      missingCompany: 0,
+      missingLocation: 0,
+      missingApplyUrl: 0,
+    }
+  );
+  const validJobs = mappedJobs.filter((job) => job.title && job.company && job.location && job.applyUrl);
 
-  return jobs
-    .map(mapRapidApiJob)
-    .filter((job) => job.title && job.company && job.location && job.applyUrl);
+  if (jobs.length > 0) {
+    console.log('RapidAPI jobs mapped:', {
+      raw: jobs.length,
+      valid: validJobs.length,
+      dropped: jobs.length - validJobs.length,
+      ...droppedSummary,
+    });
+  }
+
+  if (jobs.length > 0 && validJobs.length === 0) {
+    throw new Error(
+      `RapidAPI returned ${jobs.length} job(s), but none had all required fields after mapping. Dropped summary: ${JSON.stringify(droppedSummary)}.`
+    );
+  }
+
+  return validJobs;
 };

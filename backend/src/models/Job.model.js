@@ -92,6 +92,7 @@ const jobSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  postedAt: Date,
   lastSyncedAt: Date,
   expiresAt: Date,
   status: {

@@ -89,6 +89,13 @@ const EXPERIENCE_LABELS = {
   senior: "5+ years",
 };
 
+const EXPERIENCE_RANKS = {
+  fresher: 0,
+  junior: 1,
+  mid: 2,
+  senior: 3,
+};
+
 export const MAX_JOB_DESCRIPTION_CHARS = 4000;
 
 const KNOWN_SKILLS = Object.entries(SKILL_ALIASES).map(([keyword, canonical]) => ({
@@ -176,6 +183,68 @@ export const normalizeExperienceText = (value = "", fallbackLevel = "") => {
   return EXPERIENCE_LABELS[normalizedLevel] || "Not specified";
 };
 
+export const inferExperienceRequirement = (...values) => {
+  const text = values
+    .flat()
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!text) {
+    return {};
+  }
+
+  const yearRangeMatch = text.match(/\b(\d{1,2})\s*(?:-|to)\s*(\d{1,2})\s*(?:years?|yrs?)\b/i);
+  const plusYearMatch = text.match(/\b(\d{1,2})\s*\+?\s*(?:years?|yrs?)\b/i);
+  const monthMatch = text.match(/\b(\d{1,2})\s*\+?\s*(?:months?|mos?)\b/i);
+  const minimumYears = Number.parseInt(
+    yearRangeMatch?.[1] || plusYearMatch?.[1] || "",
+    10
+  );
+
+  if (yearRangeMatch || plusYearMatch) {
+    const experience = yearRangeMatch
+      ? `${yearRangeMatch[1]}-${yearRangeMatch[2]} years`
+      : `${plusYearMatch[1]}+ years`;
+
+    if (minimumYears <= 1) {
+      return { experience, experienceLevel: "fresher" };
+    }
+
+    if (minimumYears <= 2) {
+      return { experience, experienceLevel: "junior" };
+    }
+
+    if (minimumYears <= 5) {
+      return { experience, experienceLevel: "mid" };
+    }
+
+    return { experience, experienceLevel: "senior" };
+  }
+
+  if (monthMatch) {
+    return {
+      experience: `${monthMatch[1]}+ months`,
+      experienceLevel: "fresher",
+    };
+  }
+
+  if (/fresher|fresh graduate|entry[-\s]?level|no experience/i.test(text)) {
+    return { experience: "Fresher / entry-level", experienceLevel: "fresher" };
+  }
+
+  if (/senior|lead|principal/i.test(text)) {
+    return { experience: EXPERIENCE_LABELS.senior, experienceLevel: "senior" };
+  }
+
+  if (/experienced/i.test(text)) {
+    return { experience: "Experienced", experienceLevel: "mid" };
+  }
+
+  return {};
+};
+
 export const shortenText = (value = "", maxLength = 280) => {
   const cleaned = String(value || "").replace(/\s+/g, " ").trim();
 
@@ -237,14 +306,81 @@ export const computeMatchBreakdown = (userSkills = [], jobSkills = []) => {
     (skill) => !userSkillSet.has(normalizeSkillToken(skill))
   );
 
-  const matchScore = normalizedJobSkills.length
+  const skillMatchScore = normalizedJobSkills.length
     ? Math.round((matchedSkills.length / normalizedJobSkills.length) * 100)
     : 0;
+  const matchScore = skillMatchScore;
 
   return {
     matchScore,
+    skillMatchScore,
     matchedSkills,
     missingSkills,
+  };
+};
+
+export const computeExperienceMatchScore = (
+  userExperienceLevel = "",
+  requiredExperienceLevel = ""
+) => {
+  const normalizedUserLevel = normalizeExperienceLevel(userExperienceLevel);
+  const normalizedRequiredLevel = normalizeExperienceLevel(requiredExperienceLevel);
+
+  if (!normalizedRequiredLevel) {
+    return {
+      experienceMatchScore: 100,
+      experienceMatched: true,
+      experienceGap: 0,
+    };
+  }
+
+  if (!normalizedUserLevel) {
+    return {
+      experienceMatchScore: 0,
+      experienceMatched: false,
+      experienceGap: EXPERIENCE_RANKS[normalizedRequiredLevel] + 1,
+    };
+  }
+
+  const experienceGap =
+    EXPERIENCE_RANKS[normalizedRequiredLevel] - EXPERIENCE_RANKS[normalizedUserLevel];
+
+  if (experienceGap <= 0) {
+    return {
+      experienceMatchScore: 100,
+      experienceMatched: true,
+      experienceGap: 0,
+    };
+  }
+
+  const experienceMatchScore = Math.max(0, 100 - experienceGap * 40);
+
+  return {
+    experienceMatchScore,
+    experienceMatched: false,
+    experienceGap,
+  };
+};
+
+export const computeWeightedMatchBreakdown = (
+  userSkills = [],
+  jobSkills = [],
+  { userExperienceLevel = "", requiredExperienceLevel = "" } = {}
+) => {
+  const skillMatch = computeMatchBreakdown(userSkills, jobSkills);
+  const experienceMatch = computeExperienceMatchScore(
+    userExperienceLevel,
+    requiredExperienceLevel
+  );
+  const hasJobSkills = normalizeSkills(jobSkills).length > 0;
+  const matchScore = hasJobSkills
+    ? Math.round(skillMatch.skillMatchScore * 0.75 + experienceMatch.experienceMatchScore * 0.25)
+    : experienceMatch.experienceMatchScore;
+
+  return {
+    ...skillMatch,
+    ...experienceMatch,
+    matchScore,
   };
 };
 

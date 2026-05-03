@@ -59,6 +59,12 @@ const buildJobPayload = (payload = {}) => {
   if ('skills' in payload) normalizedPayload.skills = normalizeSkills(payload.skills);
   if ('status' in payload) normalizedPayload.status = String(payload.status || '').trim().toLowerCase();
   if ('salaryText' in payload) normalizedPayload.salaryText = String(payload.salaryText || '').trim();
+  if ('postedAt' in payload) {
+    const postedAt = payload.postedAt ? new Date(payload.postedAt) : undefined;
+    if (!Number.isNaN(postedAt?.getTime())) {
+      normalizedPayload.postedAt = postedAt;
+    }
+  }
   if ('lastSyncedAt' in payload) {
     normalizedPayload.lastSyncedAt = payload.lastSyncedAt ? new Date(payload.lastSyncedAt) : undefined;
   }
@@ -104,6 +110,7 @@ const buildJobFilters = (query = {}, options = {}) => {
   const filter = buildActiveJobFilter();
   const andConditions = [];
   const requestedSkills = normalizeSkills(query.skills);
+  const workType = String(query.workType || '').trim().toLowerCase();
 
   if (query.location) {
     andConditions.push({
@@ -112,6 +119,14 @@ const buildJobFilters = (query = {}, options = {}) => {
         $options: 'i',
       },
     });
+  }
+
+  if (workType === 'internship') {
+    andConditions.push({ type: 'internship' });
+  }
+
+  if (workType === 'job') {
+    andConditions.push({ type: { $ne: 'internship' } });
   }
 
   if (requestedSkills.length) {
@@ -141,6 +156,22 @@ const buildJobFilters = (query = {}, options = {}) => {
     if (experienceLevel) {
       andConditions.push({ experienceLevel });
     }
+  }
+
+  if (query.domain) {
+    const domainExpression = {
+      $regex: escapeRegExp(String(query.domain).trim()),
+      $options: 'i',
+    };
+
+    andConditions.push({
+      $or: [
+        { title: domainExpression },
+        { description: domainExpression },
+        { requirements: domainExpression },
+        { skills: domainExpression },
+      ],
+    });
   }
 
   if (query.search) {
@@ -194,7 +225,7 @@ const sortRecommendedJobs = (left, right) => {
     return right.matchedSkills.length - left.matchedSkills.length;
   }
 
-  return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+  return new Date(right.postedAt || right.createdAt).getTime() - new Date(left.postedAt || left.createdAt).getTime();
 };
 
 export const createJob = async (req, res, next) => {
@@ -263,7 +294,7 @@ export const getAllJobs = async (req, res, next) => {
     const [jobs, total] = await Promise.all([
       Job.find(filter)
         .populate('postedBy', 'name role')
-        .sort({ createdAt: -1 })
+        .sort({ postedAt: -1, createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit),
       Job.countDocuments(filter),
@@ -297,7 +328,9 @@ export const getRecommendedJobs = async (req, res, next) => {
 
     const jobs = await Job.find(filter).populate('postedBy', 'name role');
     const recommendedJobs = jobs
-      .map((job) => serializeRecommendedJob(job, userSkills, profile.bookmarkSet))
+      .map((job) =>
+        serializeRecommendedJob(job, userSkills, profile.bookmarkSet, profile.userExperienceLevel)
+      )
       .sort(sortRecommendedJobs);
 
     const paginatedJobs = recommendedJobs.slice((page - 1) * limit, page * limit);
@@ -336,10 +369,12 @@ export const getBookmarkedJobs = async (req, res, next) => {
       _id: { $in: [...profile.bookmarkSet] },
     })
       .populate('postedBy', 'name role')
-      .sort({ createdAt: -1 });
+      .sort({ postedAt: -1, createdAt: -1 });
 
     sendSuccess(res, {
-      jobs: jobs.map((job) => serializeRecommendedJob(job, profile.userSkills, profile.bookmarkSet)),
+      jobs: jobs.map((job) =>
+        serializeRecommendedJob(job, profile.userSkills, profile.bookmarkSet, profile.userExperienceLevel)
+      ),
     });
   } catch (error) {
     next(error);

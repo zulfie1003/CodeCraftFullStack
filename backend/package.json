@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed:demo": "node src/scripts/seedDemoData.js",
+    "check:rapidapi": "node src/scripts/checkRapidApiJobs.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
