@@ -84,10 +84,12 @@ function useScrollReveal(selectors = DEFAULT_REVEAL_SELECTORS) {
       }
 
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const isCompactViewport = window.matchMedia("(max-width: 760px)").matches;
 
       targets.forEach((target, index) => {
         target.classList.add("reveal-on-scroll");
-        target.style.setProperty("--reveal-delay", `${(index % 6) * 60}ms`);
+        const delay = isCompactViewport ? 0 : (index % 3) * 24;
+        target.style.setProperty("--reveal-delay", `${delay}ms`);
       });
 
       if (prefersReducedMotion || typeof IntersectionObserver === "undefined") {
@@ -107,8 +109,8 @@ function useScrollReveal(selectors = DEFAULT_REVEAL_SELECTORS) {
           });
         },
         {
-          threshold: 0.14,
-          rootMargin: "0px 0px -12% 0px",
+          threshold: isCompactViewport ? 0.04 : 0.08,
+          rootMargin: isCompactViewport ? "0px 0px -4% 0px" : "0px 0px -8% 0px",
         }
       );
 

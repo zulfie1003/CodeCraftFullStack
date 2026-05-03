@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
 import Landing from "./components/Landing.jsx";
 import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
@@ -27,6 +28,7 @@ import OrganizerHackathons from "./pages/organizer/Hackathons.jsx";
 import Participants from "./pages/organizer/Participants.jsx";
 import OrganizerProfile from "./pages/organizer/OrganizerProfile.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
+import { warmBackend } from "./api/axios";
 import { getHomePathForRole, getStoredUser } from "./utils/auth";
 import "./styles/light-mode-overrides.css";
 import "./styles/interaction-system.css";
@@ -42,6 +44,10 @@ function FallbackRedirect() {
 }
 
 function App() {
+  useEffect(() => {
+    warmBackend();
+  }, []);
+
   return (
     <ThemeProvider>
       <BrowserRouter>

@@ -382,8 +382,11 @@
   min-width: 118px;
   padding: 12px 14px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.48);
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+  border: 1px solid rgba(191, 219, 254, 0.62);
+  box-shadow:
+    0 14px 28px rgba(37, 99, 235, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
   text-align: center;
   color: #000000;
 }
@@ -392,6 +395,7 @@
   display: block;
   font-size: 28px;
   line-height: 1;
+  color: #ffffff;
 }
 
 .job-match-widget span {

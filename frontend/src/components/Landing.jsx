@@ -105,7 +105,11 @@ function Landing() {
   useScrollReveal();
 
   const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const compactViewport = window.matchMedia("(max-width: 760px)").matches;
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: prefersReducedMotion || compactViewport ? "auto" : "smooth", block: "start" });
   };
 
   return (
